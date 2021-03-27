@@ -5,23 +5,21 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_size/window_size.dart';
-
+import 'package:win32/win32.dart';
 import 'src/models/settings.dart';
 import 'src/providers.dart';
 import 'src/widgets/home_page.dart';
-import 'src/win32/dpi_awareness.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowTitle('Youtube Downloader');
-    setWindowMinSize(const Size(600, 400));
+    setWindowMinSize(const Size(600, 800));
     setWindowMaxSize(Size.infinite);
     if (Platform.isWindows) {
       SetProcessDpiAwareness(1);
     }
   }
-
   runApp(MyApp());
 }
 

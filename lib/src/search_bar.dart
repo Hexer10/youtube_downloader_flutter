@@ -11,33 +11,35 @@ class SearchBar extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Container(
-        decoration: BoxDecoration(border: Border(bottom: BorderSide())),
-        padding: const EdgeInsets.only(left: 10),
-        height: kToolbarHeight,
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  }),
-              Text(
-                'Youtube Downloader',
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  showSearch(
-                      context: context, delegate: CustomSearchDelegate());
-                },
-                icon: const Icon(
-                  Icons.search,
+      child: Material(
+        elevation: 5,
+        child: Container(
+          padding: const EdgeInsets.only(left: 10),
+          height: kToolbarHeight,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    }),
+                Text(
+                  'Youtube Downloader',
+                  style: Theme.of(context).textTheme.headline5,
                 ),
-              )
-            ]),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    showSearch(
+                        context: context, delegate: CustomSearchDelegate());
+                  },
+                  icon: const Icon(
+                    Icons.search,
+                  ),
+                )
+              ]),
+        ),
       ),
     );
   }

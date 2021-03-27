@@ -6,9 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:youtube_downloader_flutter/src/models/settings.dart';
-import 'package:youtube_downloader_flutter/src/providers.dart';
-import 'package:settings_ui/settings_ui.dart';
+import '../models/settings.dart';
+import '../providers.dart';
 
 class SettingsPage extends HookWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -18,47 +17,93 @@ class SettingsPage extends HookWidget {
     final settings = useProvider(settingsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: SettingsList(
-        sections: [
-          SettingsSection(
-            title: 'Section',
-            tiles: [
-              SettingsTile.switchTile(
-                title: 'Dark Mode',
-                leading: const Icon(CupertinoIcons.moon),
-                switchValue: settings.state.theme == ThemeSetting.dark,
-                onToggle: (bool value) {
-                  if (value) {
-                    settings.state =
-                        settings.state.copyWith(theme: ThemeSetting.dark);
-                    return;
-                  }
-                  settings.state =
-                      settings.state.copyWith(theme: ThemeSetting.light);
-                },
-              ),
-              SettingsTile(
-                title: 'Download directory',
-                subtitle: settings.state.downloadPath,
-                onPressed: (context) async {
-                  if (Platform.isWindows) {
-                    final file = DirectoryPicker()
-                      ..title = 'Select download directory';
-
-                    final result = file.getDirectory();
-                    if (result != null) {
-                      print('Path: $result');
-                    }
-                  } else {
-                    final result = await FilePicker.platform.getDirectoryPath();
-                    print('Path: $result');
-                  }
-                },
-              )
-            ],
+      appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: SettingsAppBar()),
+      body: ListView(
+        padding: EdgeInsets.only(top: 10),
+        children: [
+          ListTile(
+            title: Text('Dark Mode'),
+            leading: const Icon(CupertinoIcons.moon),
+            trailing: Switch(
+              value: settings.state.theme == ThemeSetting.dark,
+              onChanged: (bool value) => themeOnChanged(settings, value),
+            ),
+            onTap: () => themeOnChanged(
+                settings, settings.state.theme != ThemeSetting.dark),
           ),
+          Divider(
+            height: 0,
+          ),
+          ListTile(
+            title: Text('Download directory'),
+            subtitle: Text(settings.state.downloadPath),
+            onTap: () async {
+              if (Platform.isWindows) {
+                final file = DirectoryPicker()
+                  ..title = 'Select download directory';
+
+                final result = file.getDirectory();
+                if (result == null) {
+                  return;
+                }
+                settings.state =
+                    settings.state.copyWith(downloadPath: result.path);
+                return;
+              } else {
+                final result = await FilePicker.platform.getDirectoryPath();
+                if (result == null) {
+                  return;
+                }
+                if (result == '/') {
+                  print('Invalid path!');
+                  return;
+                }
+                settings.state = settings.state.copyWith(downloadPath: result);
+              }
+            },
+          )
         ],
+      ),
+    );
+  }
+
+  void themeOnChanged(StateController<Settings> settings, bool value) {
+    if (value) {
+      settings.state = settings.state.copyWith(theme: ThemeSetting.dark);
+      return;
+    }
+    settings.state = settings.state.copyWith(theme: ThemeSetting.light);
+  }
+}
+
+class SettingsAppBar extends HookWidget {
+  const SettingsAppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    return SafeArea(
+      child: Material(
+        elevation: 5,
+        child: Container(
+          padding: const EdgeInsets.only(left: 10),
+          height: kToolbarHeight,
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+            IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop()),
+            Center(
+              child: Text(
+                'Settings',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+            ),
+          ]),
+        ),
       ),
     );
   }

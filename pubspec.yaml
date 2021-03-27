@@ -30,6 +30,8 @@ dependencies:
   filepicker_windows:
     git: https://github.com/Hexer10/filepicker_windows.git
   file_picker: ^3.0.0
+  auto_size_text: ^3.0.0-nullsafety.0
+
 
 
 dev_dependencies:

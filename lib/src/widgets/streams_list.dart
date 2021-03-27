@@ -4,10 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:youtube_downloader_flutter/src/providers.dart';
-import 'package:youtube_downloader_flutter/src/shared.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:path/path.dart' as path;
+
+import '../providers.dart';
+import '../shared.dart';
 
 class StreamsList extends HookWidget {
   final Video video;
