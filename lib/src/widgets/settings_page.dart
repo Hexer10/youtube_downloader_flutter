@@ -21,10 +21,10 @@ class SettingsPage extends HookWidget {
           preferredSize: Size.fromHeight(kToolbarHeight),
           child: SettingsAppBar()),
       body: ListView(
-        padding: EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 10),
         children: [
           ListTile(
-            title: Text('Dark Mode'),
+            title: const Text('Dark Mode'),
             leading: const Icon(CupertinoIcons.moon),
             trailing: Switch(
               value: settings.state.theme == ThemeSetting.dark,
@@ -33,11 +33,11 @@ class SettingsPage extends HookWidget {
             onTap: () => themeOnChanged(
                 settings, settings.state.theme != ThemeSetting.dark),
           ),
-          Divider(
+          const Divider(
             height: 0,
           ),
           ListTile(
-            title: Text('Download directory'),
+            title: const Text('Download directory'),
             subtitle: Text(settings.state.downloadPath),
             onTap: () async {
               if (Platform.isWindows) {
@@ -69,6 +69,7 @@ class SettingsPage extends HookWidget {
     );
   }
 
+  // ignore: avoid_positional_boolean_parameters
   void themeOnChanged(StateController<Settings> settings, bool value) {
     if (value) {
       settings.state = settings.state.copyWith(theme: ThemeSetting.dark);
@@ -83,16 +84,13 @@ class SettingsAppBar extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return SafeArea(
       child: Material(
         elevation: 5,
         child: Container(
           padding: const EdgeInsets.only(left: 10),
           height: kToolbarHeight,
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          child: Row(children: [
             IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.of(context).pop()),

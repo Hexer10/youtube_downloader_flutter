@@ -14,6 +14,8 @@ class SearchService {
   final String query;
   final ValueNotifier<List<Video>> videos = ValueNotifier<List<Video>>([]);
   final ValueNotifier<bool> loading = ValueNotifier<bool>(true);
+
+  var _endResults = false;
   late SearchList _currentPage;
 
   SearchService(this.yt, this.query) {
@@ -24,12 +26,22 @@ class SearchService {
     });
   }
 
-  void nextPage() async {
+  Future<void> nextPage() async {
+    if (_endResults) {
+      return;
+    }
+
     if (loading.value) {
       throw Exception('Cannot request the next page while loading.');
     }
     loading.value = true;
-    _currentPage = await _currentPage.nextPage();
+    final page = await _currentPage.nextPage();
+    if (page == null) {
+      loading.value = false;
+      _endResults = true;
+      return;
+    }
+    _currentPage = page;
     videos.value = [...videos.value, ..._currentPage];
     loading.value = false;
   }
@@ -127,7 +139,7 @@ class LandscapeSearch extends HookWidget {
                       ],
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: AutoSizeText(
                         video.title,
                         style: Theme.of(context)
@@ -139,11 +151,11 @@ class LandscapeSearch extends HookWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Flexible(
                       flex: 2,
                       child: Padding(
-                        padding: EdgeInsets.only(left: 17),
+                        padding: const EdgeInsets.only(left: 17),
                         child: AutoSizeText('From: ${video.author}',
                             style: Theme.of(context)
                                 .textTheme
@@ -163,11 +175,10 @@ class LandscapeSearch extends HookWidget {
           ),
         );
       },
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 250,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
-        childAspectRatio: 1,
       ),
     );
   }

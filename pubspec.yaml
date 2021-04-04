@@ -12,29 +12,29 @@ dependencies:
   flutter:
     sdk: flutter
 
-  hooks_riverpod: ^0.13.1
+  hooks_riverpod: ^0.13.1+1
   flutter_hooks: ^0.16.0
-  youtube_explode_dart: ^1.9.0-nullsafety.3
+  youtube_explode_dart: ^1.9.1
   stream_transform: ^2.0.0
   path_provider: ^2.0.1
   path: ^1.8.0
-  shared_preferences: ^2.0.4
+  shared_preferences: ^2.0.5
   window_size:
     git:
       url: git://github.com/google/flutter-desktop-embedding.git
       path: plugins/window_size
-  settings_ui:
-    git: https://github.com/zigapovhe/flutter-settings-ui.git
   cupertino_icons: ^1.0.2
-  win32: ^2.0.4
-  filepicker_windows:
-    git: https://github.com/Hexer10/filepicker_windows.git
-  file_picker: ^3.0.0
+  win32: ^2.0.5
+  filepicker_windows: ^2.0.0
+  file_picker: ^3.0.1
   auto_size_text: ^3.0.0-nullsafety.0
-
-
+  collection: ^1.15.0
+  json_annotation: ^4.0.1
+  url_launcher: ^6.0.3
 
 dev_dependencies:
+  build_runner: ^1.12.2
+  json_serializable: ^4.1.0
   lint: ^1.5.3
 
 

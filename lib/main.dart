@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_size/window_size.dart';
 import 'package:win32/win32.dart';
+import 'package:youtube_downloader_flutter/src/models/download_manager.dart';
 import 'src/models/settings.dart';
 import 'src/providers.dart';
 import 'src/widgets/home_page.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderScope(
       observers: [MainObserver()],
-      child: SettingsManager(),
+      child: AppInit(),
     );
   }
 }
@@ -55,14 +56,16 @@ class MainObserver implements ProviderObserver {
   }
 }
 
-class SettingsManager extends HookWidget {
+class AppInit extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final fetched = useState<bool>(false);
     final settings = useProvider(settingsProvider);
+    final downloadManager = useProvider(downloadProvider);
 
     useEffect(() {
       SharedPreferences.getInstance().then((value) async {
+        downloadManager.state = DownloadManagerImpl.init(value);
         settings.state = await SettingsImpl.init(value);
         fetched.value = true;
       });
@@ -77,7 +80,6 @@ class SettingsManager extends HookWidget {
         ),
       );
     }
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Youtube Downloader',
