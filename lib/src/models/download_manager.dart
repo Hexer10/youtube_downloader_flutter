@@ -11,7 +11,7 @@ import 'package:path/path.dart' as path;
 
 part 'download_manager.g.dart';
 
-class DownloadManager extends ChangeNotifier  {
+class DownloadManager extends ChangeNotifier {
   DownloadManager();
 
   Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
@@ -76,8 +76,10 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
     if (!(await file.exists())) {
       return strPath;
     }
-    final basename = path.withoutExtension(strPath);
+    final basename =
+        path.withoutExtension(strPath).replaceFirst(RegExp(r' \([0-9]+\)$'), '');
     final ext = path.extension(strPath);
+
     var count = 0;
 
     while (true) {
@@ -135,10 +137,12 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
       Future<void> downloadListener() async {
         muxedTrack.downloadPerc =
-            ((audioTrack.downloadPerc + videoTrack.downloadPerc) / 2).round();
+            (muxedTrack.downloadedBytes / muxedTrack.totalSize).round();
         if (audioTrack.downloadStatus == DownloadStatus.success &&
             videoTrack.downloadStatus == DownloadStatus.success) {
           muxedTrack.downloadStatus = DownloadStatus.muxing;
+          final path = await getValidPath(muxedTrack.path);
+          muxedTrack.path = path;
           final process = await Process.start(
               'ffmpeg',
               [
@@ -147,10 +151,14 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
                 '-i',
                 videoTrack.path,
                 '-shortest',
-                muxedTrack.path
+                path
               ],
               runInShell: true);
           process.exitCode.then((exitCode) async {
+            //sigterm
+            if (exitCode == -1) {
+              return;
+            }
             print('Completed with: $exitCode');
             muxedTrack.downloadStatus = DownloadStatus.success;
 
@@ -166,7 +174,6 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
             videoTrack._cancelCallback!();
 
             process.kill();
-            await File(muxedTrack.path).delete();
             muxedTrack.downloadStatus = DownloadStatus.canceled;
           };
         }
@@ -207,8 +214,9 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
         downloadVideo.downloadStatus = DownloadStatus.failed;
         downloadVideo.error = error.toString();
       }, onDone: () async {
-        await cleanUp(sink, file, downloadPath);
+        final newPath = await cleanUp(sink, file, downloadPath);
         downloadVideo.downloadStatus = DownloadStatus.success;
+        downloadVideo.path = newPath!;
         showSnackbar(Text('${video.title} download finished!'));
       }, cancelOnError: true);
 
@@ -266,13 +274,15 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
   /// Flushes and closes the sink.
   /// If path is specified the file is moved to that path, otherwise is it deleted.
-  Future<void> cleanUp(IOSink sink, File file, [String? path]) async {
+  /// Returns the new file path if [path] is specified.
+  Future<String? > cleanUp(IOSink sink, File file, [String? path]) async {
     await sink.flush();
     await sink.close();
     if (path != null) {
-      final oldFile = file.path;
+      // ignore: parameter_assignments
+      path = await getValidPath(path);
       await file.rename(path);
-      return;
+      return path;
     }
     await file.delete();
   }
@@ -301,15 +311,18 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 @JsonSerializable()
 class DownloadVideo extends ChangeNotifier {
   final int id;
-  final String path;
   final String title;
   final String size;
   final int totalSize;
+
+  String _path;
 
   int _downloadPerc = 0;
   DownloadStatus _downloadStatus = DownloadStatus.downloading;
   int _downloadedBytes = 0;
   String _error = '';
+
+  String get path => _path;
 
   int get downloadPerc => _downloadPerc;
 
@@ -318,6 +331,13 @@ class DownloadVideo extends ChangeNotifier {
   int get downloadedBytes => _downloadedBytes;
 
   String get error => _error;
+
+  set path(String path) {
+    _path = path;
+
+    _prefs?.setString('video_$id', json.encode(this));
+    notifyListeners();
+  }
 
   set downloadPerc(int value) {
     _downloadPerc = value;
@@ -353,7 +373,7 @@ class DownloadVideo extends ChangeNotifier {
   @JsonKey(ignore: true)
   final SharedPreferences? _prefs;
 
-  DownloadVideo(this.id, this.path, this.title, this.size, this.totalSize,
+  DownloadVideo(this.id, this._path, this.title, this.size, this.totalSize,
       {SharedPreferences? prefs})
       : _prefs = prefs;
 

@@ -26,7 +26,11 @@ class DownloadTile extends HookWidget {
               }
             : null,
         title: Text(video.title),
-        subtitle: Text(video.path),
+        subtitle: Text(video.path,
+            style: video.downloadStatus == DownloadStatus.canceled ||
+                    video.downloadStatus == DownloadStatus.failed
+                ? const TextStyle(decoration: TextDecoration.lineThrough)
+                : null),
         trailing: TrailingIcon(video),
         leading: LeadingIcon(video));
   }
@@ -69,7 +73,6 @@ class TrailingIcon extends HookWidget {
             icon: const Icon(Icons.cancel),
             onPressed: () async {
               video.cancelDownload();
-              //TODO: Remove video from list.
             });
       case DownloadStatus.success:
         return Row(
@@ -95,9 +98,17 @@ class TrailingIcon extends HookWidget {
       case DownloadStatus.failed:
         return Text(video.error);
       case DownloadStatus.muxing:
-        return const Text('Merging!');
+        return IconButton(
+            icon: const Icon(Icons.cancel),
+            onPressed: () async {
+              video.cancelDownload();
+            });
       case DownloadStatus.canceled:
-        return const Text('Canceled!');
+        return IconButton(
+            icon: const Icon(Icons.delete_forever),
+            onPressed: () async {
+              downloadManager.removeVideo(video);
+            });
     }
   }
 }
