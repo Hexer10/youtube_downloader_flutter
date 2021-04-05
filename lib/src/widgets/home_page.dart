@@ -4,7 +4,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import '../search_bar.dart';
 import 'app_drawer.dart';
 
-
 @immutable
 class HomePage extends HookWidget {
   const HomePage({Key? key}) : super(key: key);

@@ -80,7 +80,8 @@ class SettingsPage extends HookWidget {
             leading: const Icon(CupertinoIcons.moon),
             trailing: DropdownButton(
               value: settings.state.ffmpegContainer,
-              onChanged: (String? value) => settings.state = settings.state.copyWith(ffmpegContainer: value),
+              onChanged: (String? value) => settings.state =
+                  settings.state.copyWith(ffmpegContainer: value),
               items: ffmpegContainers,
             ),
             onTap: () => themeOnChanged(

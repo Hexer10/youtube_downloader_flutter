@@ -9,7 +9,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../providers.dart';
 import 'streams_list.dart';
 
-// TODO: Maybe exist ChangeNotifier
+// TODO: Maybe remove ValueNotifiers and make class extend ChangeNotifier
 class SearchService {
   final YoutubeExplode yt;
   final String query;
@@ -21,7 +21,7 @@ class SearchService {
 
   SearchService(this.yt, this.query) {
     yt.search.getVideos(query).then((value) {
-      videos.value = [...videos.value, ...value];
+      videos.value = [...videos.value, ...value.where((e) => !e.isLive)];
       loading.value = false;
       _currentPage = value;
     });
@@ -43,7 +43,7 @@ class SearchService {
       return;
     }
     _currentPage = page;
-    videos.value = [...videos.value, ..._currentPage];
+    videos.value = [...videos.value, ..._currentPage.where((e) => !e.isLive)];
     loading.value = false;
   }
 }

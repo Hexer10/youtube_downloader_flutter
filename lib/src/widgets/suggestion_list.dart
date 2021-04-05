@@ -19,8 +19,7 @@ class SuggestionList extends HookWidget {
     final isMounted = useIsMounted();
 
     useEffect(() {
-      //TODO: Find out why debouncing with `stream.debounce(...)` always
-      // returns an empty string (the default value).
+      //TODO: Find out why debouncing with `stream.debounce(...)` always returns an empty string (the default value).
       deb.run(() {
         if (isMounted()) {
           controller.add(query);

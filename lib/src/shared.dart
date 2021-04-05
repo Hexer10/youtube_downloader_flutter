@@ -23,4 +23,3 @@ AsyncSnapshot<T> useMemoFuture<T>(Future<T> Function() future,
   final memo = useMemoized(future, keys);
   return useFuture(memo, initialData: initialData);
 }
-

@@ -8,7 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Settings {
   const Settings();
 
-  SettingsImpl copyWith({String? downloadPath, ThemeSetting? theme, String? ffmpegContainer}) =>
+  SettingsImpl copyWith(
+          {String? downloadPath,
+          ThemeSetting? theme,
+          String? ffmpegContainer}) =>
       throw UnimplementedError();
 
   String get ffmpegContainer => throw UnimplementedError();
@@ -30,10 +33,12 @@ class SettingsImpl implements Settings {
   @override
   final String ffmpegContainer;
 
-  SettingsImpl._(this._prefs, this.downloadPath, this.theme, this.ffmpegContainer);
+  SettingsImpl._(
+      this._prefs, this.downloadPath, this.theme, this.ffmpegContainer);
 
   @override
-  SettingsImpl copyWith({String? downloadPath, ThemeSetting? theme, String? ffmpegContainer}) {
+  SettingsImpl copyWith(
+      {String? downloadPath, ThemeSetting? theme, String? ffmpegContainer}) {
     if (downloadPath != null) {
       _prefs.setString('download_path', downloadPath);
     }
@@ -43,8 +48,8 @@ class SettingsImpl implements Settings {
     if (ffmpegContainer != null) {
       _prefs.setString('ffmpeg_container', ffmpegContainer);
     }
-    return SettingsImpl._(
-        _prefs, downloadPath ?? this.downloadPath, theme ?? this.theme, ffmpegContainer ?? this.ffmpegContainer);
+    return SettingsImpl._(_prefs, downloadPath ?? this.downloadPath,
+        theme ?? this.theme, ffmpegContainer ?? this.ffmpegContainer);
   }
 
   static Future<SettingsImpl> init(SharedPreferences prefs) async {
@@ -63,7 +68,8 @@ class SettingsImpl implements Settings {
       ffmpegContainer = '.mp4';
       prefs.setString('ffmpeg_container', '.mp4');
     }
-    return SettingsImpl._(prefs, path, ThemeSetting.fromId(themeId), ffmpegContainer);
+    return SettingsImpl._(
+        prefs, path, ThemeSetting.fromId(themeId), ffmpegContainer);
   }
 }
 
@@ -71,7 +77,8 @@ class ThemeSetting {
   final int id;
   final ThemeData themeData;
 
-  static final ThemeSetting light = ThemeSetting._(0, ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white));
+  static final ThemeSetting light = ThemeSetting._(
+      0, ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white));
   static final ThemeSetting dark = ThemeSetting._(1, ThemeData.dark());
 
   const ThemeSetting._(this.id, this.themeData);

@@ -15,7 +15,9 @@ class DownloadManager extends ChangeNotifier {
   DownloadManager();
 
   Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
-          {StreamInfo? singleStream, StreamMerge? merger, String? ffmpegContainer}) =>
+          {StreamInfo? singleStream,
+          StreamMerge? merger,
+          String? ffmpegContainer}) =>
       throw UnimplementedError();
 
   Future<void> removeVideo(DownloadVideo video) => throw UnimplementedError();
@@ -76,8 +78,9 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
     if (!(await file.exists())) {
       return strPath;
     }
-    final basename =
-        path.withoutExtension(strPath).replaceFirst(RegExp(r' \([0-9]+\)$'), '');
+    final basename = path
+        .withoutExtension(strPath)
+        .replaceFirst(RegExp(r' \([0-9]+\)$'), '');
     final ext = path.extension(strPath);
 
     var count = 0;
@@ -94,9 +97,14 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
   @override
   Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
-      {StreamInfo? singleStream, StreamMerge? merger, String? ffmpegContainer}) async {
+      {StreamInfo? singleStream,
+      StreamMerge? merger,
+      String? ffmpegContainer}) async {
     assert(singleStream != null || merger != null);
-    assert(merger == null || merger.video != null && merger.audio != null && ffmpegContainer != null);
+    assert(merger == null ||
+        merger.video != null &&
+            merger.audio != null &&
+            ffmpegContainer != null);
 
     final isMerging = singleStream == null;
     final stream = singleStream ?? merger!.video!;
@@ -143,16 +151,8 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
           muxedTrack.downloadStatus = DownloadStatus.muxing;
           final path = await getValidPath(muxedTrack.path);
           muxedTrack.path = path;
-          final process = await Process.start(
-              'ffmpeg',
-              [
-                '-i',
-                audioTrack.path,
-                '-i',
-                videoTrack.path,
-                '-shortest',
-                path
-              ],
+          final process = await Process.start('ffmpeg',
+              ['-i', audioTrack.path, '-i', videoTrack.path, '-shortest', path],
               runInShell: true);
           process.exitCode.then((exitCode) async {
             //sigterm
@@ -215,7 +215,6 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       final sub = dataStream
           .listen((data) => handleData(data, sink, downloadVideo),
               onError: (error, __) async {
-        //TODO: Show the error in the downloads page.
         showSnackbar(Text('${video.title} download failed!'));
         await cleanUp(sink, file);
         downloadVideo.downloadStatus = DownloadStatus.failed;
@@ -282,7 +281,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
   /// Flushes and closes the sink.
   /// If path is specified the file is moved to that path, otherwise is it deleted.
   /// Returns the new file path if [path] is specified.
-  Future<String? > cleanUp(IOSink sink, File file, [String? path]) async {
+  Future<String?> cleanUp(IOSink sink, File file, [String? path]) async {
     await sink.flush();
     await sink.close();
     if (path != null) {
