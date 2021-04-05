@@ -11,7 +11,8 @@ class Settings {
   SettingsImpl copyWith(
           {String? downloadPath,
           ThemeSetting? theme,
-          String? ffmpegContainer}) =>
+          String? ffmpegContainer,
+          Locale? locale}) =>
       throw UnimplementedError();
 
   String get ffmpegContainer => throw UnimplementedError();
@@ -19,6 +20,13 @@ class Settings {
   String get downloadPath => throw UnimplementedError();
 
   ThemeSetting get theme => throw UnimplementedError();
+
+  Locale get locale => throw UnimplementedError();
+
+  static const List<Locale> locales = [
+    Locale('en', ''),
+    Locale('it', ''),
+  ];
 }
 
 class SettingsImpl implements Settings {
@@ -33,12 +41,18 @@ class SettingsImpl implements Settings {
   @override
   final String ffmpegContainer;
 
-  SettingsImpl._(
-      this._prefs, this.downloadPath, this.theme, this.ffmpegContainer);
+  @override
+  final Locale locale;
+
+  SettingsImpl._(this._prefs, this.downloadPath, this.theme,
+      this.ffmpegContainer, this.locale);
 
   @override
   SettingsImpl copyWith(
-      {String? downloadPath, ThemeSetting? theme, String? ffmpegContainer}) {
+      {String? downloadPath,
+      ThemeSetting? theme,
+      String? ffmpegContainer,
+      Locale? locale}) {
     if (downloadPath != null) {
       _prefs.setString('download_path', downloadPath);
     }
@@ -48,8 +62,16 @@ class SettingsImpl implements Settings {
     if (ffmpegContainer != null) {
       _prefs.setString('ffmpeg_container', ffmpegContainer);
     }
-    return SettingsImpl._(_prefs, downloadPath ?? this.downloadPath,
-        theme ?? this.theme, ffmpegContainer ?? this.ffmpegContainer);
+    if (locale != null) {
+      _prefs.setString('locale', locale.languageCode);
+    }
+
+    return SettingsImpl._(
+        _prefs,
+        downloadPath ?? this.downloadPath,
+        theme ?? this.theme,
+        ffmpegContainer ?? this.ffmpegContainer,
+        locale ?? this.locale);
   }
 
   static Future<SettingsImpl> init(SharedPreferences prefs) async {
@@ -68,8 +90,15 @@ class SettingsImpl implements Settings {
       ffmpegContainer = '.mp4';
       prefs.setString('ffmpeg_container', '.mp4');
     }
-    return SettingsImpl._(
-        prefs, path, ThemeSetting.fromId(themeId), ffmpegContainer);
+
+    var langCode = prefs.getString('locale');
+    if (langCode == null) {
+      final defaultLang = WidgetsBinding.instance!.window.locales.first;
+      langCode = defaultLang.languageCode;
+      prefs.setString('locale', defaultLang.languageCode);
+    }
+    return SettingsImpl._(prefs, path, ThemeSetting.fromId(themeId),
+        ffmpegContainer, Locale(langCode));
   }
 }
 

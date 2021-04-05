@@ -1,0 +1,16 @@
+{
+  "title": "Youtube Downloader",
+  "helloWorld": "Hello World!",
+
+  "settings": "Settings",
+  "darkMode": "Dark Mode",
+  "ffmpegContainer": "ffmpeg container",
+  "ffmpegDescription": "This is the output format when two tracks (audio + video) are merged",
+  "language": "Language",
+  "downloadDir": "Download Directory",
+  "selectDownloadDir": "Select download directory",
+  "invalidDir": "Invalid directory",
+
+  "downloads": "Downloads",
+  "author": "Author"
+}

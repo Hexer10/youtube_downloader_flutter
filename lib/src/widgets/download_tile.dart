@@ -21,6 +21,7 @@ class DownloadTile extends HookWidget {
                 if (await canLaunch(url)) {
                   launch(url);
                 } else {
+                  //TODO: Show snackbar
                   print('Cannot Launch');
                 }
               }
@@ -85,6 +86,7 @@ class TrailingIcon extends HookWidget {
                   if (await canLaunch(url)) {
                     launch(url);
                   } else {
+                    //TODO: Show snackbar
                     print('Cannot Launch');
                   }
                 }),

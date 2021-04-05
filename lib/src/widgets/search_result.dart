@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../providers.dart';
 import 'streams_list.dart';
@@ -157,7 +158,8 @@ class LandscapeSearch extends HookWidget {
                       flex: 2,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 17),
-                        child: AutoSizeText('From: ${video.author}',
+                        child: AutoSizeText(
+                            '${AppLocalizations.of(context)!.author}: ${video.author}',
                             style: Theme.of(context)
                                 .textTheme
                                 .subtitle1

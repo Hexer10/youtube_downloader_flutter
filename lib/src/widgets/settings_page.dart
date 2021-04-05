@@ -8,9 +8,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../models/settings.dart';
 import '../providers.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsPage extends HookWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  SettingsPage({Key? key}) : super(key: key);
 
   static const ffmpegContainers = <DropdownMenuItem<String>>[
     DropdownMenuItem(value: '.mp4', child: Text('.mp4')),
@@ -18,8 +19,14 @@ class SettingsPage extends HookWidget {
     DropdownMenuItem(value: '.mkv', child: Text('.mkv'))
   ];
 
+  final locales = Settings.locales
+      .map((e) => DropdownMenuItem(value: e, child: Text(e.languageCode)))
+      .toList();
+
+
   @override
   Widget build(BuildContext context) {
+    final intl = AppLocalizations.of(context)!;
     final settings = useProvider(settingsProvider);
 
     return Scaffold(
@@ -30,7 +37,7 @@ class SettingsPage extends HookWidget {
         padding: const EdgeInsets.only(top: 10),
         children: [
           ListTile(
-            title: const Text('Dark Mode'),
+            title: Text(intl.darkMode),
             leading: const Icon(CupertinoIcons.moon),
             trailing: Switch(
               value: settings.state.theme == ThemeSetting.dark,
@@ -43,12 +50,12 @@ class SettingsPage extends HookWidget {
             height: 0,
           ),
           ListTile(
-            title: const Text('Download directory'),
+            title: Text(intl.downloadDir),
             subtitle: Text(settings.state.downloadPath),
             onTap: () async {
               if (Platform.isWindows) {
                 final file = DirectoryPicker()
-                  ..title = 'Select download directory';
+                  ..title = intl.selectDownloadDir;
 
                 final result = file.getDirectory();
                 if (result == null) {
@@ -63,6 +70,7 @@ class SettingsPage extends HookWidget {
                   return;
                 }
                 if (result == '/') {
+                  //TODO Show snackbar when path is not valid
                   print('Invalid path!');
                   return;
                 }
@@ -74,15 +82,27 @@ class SettingsPage extends HookWidget {
             height: 0,
           ),
           ListTile(
-            title: const Text('ffmpeg container'),
-            subtitle: const Text(
-                'This is the output format when two tracks (audio + video) are merged.'),
-            leading: const Icon(CupertinoIcons.moon),
+            title: Text(intl.ffmpegContainer),
+            subtitle: Text(intl.ffmpegDescription),
             trailing: DropdownButton(
               value: settings.state.ffmpegContainer,
               onChanged: (String? value) => settings.state =
                   settings.state.copyWith(ffmpegContainer: value),
               items: ffmpegContainers,
+            ),
+            onTap: () => themeOnChanged(
+                settings, settings.state.theme != ThemeSetting.dark),
+          ),
+          const Divider(
+            height: 0,
+          ),
+          ListTile(
+            title: Text(intl.language),
+            trailing: DropdownButton(
+              value: settings.state.locale,
+              onChanged: (Locale? value) =>
+                  settings.state = settings.state.copyWith(locale: value),
+              items: locales,
             ),
             onTap: () => themeOnChanged(
                 settings, settings.state.theme != ThemeSetting.dark),
@@ -119,7 +139,7 @@ class SettingsAppBar extends HookWidget {
                 onPressed: () => Navigator.of(context).pop()),
             Center(
               child: Text(
-                'Settings',
+                AppLocalizations.of(context)!.settings,
                 style: Theme.of(context).textTheme.headline5,
               ),
             ),

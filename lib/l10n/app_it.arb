@@ -1,0 +1,17 @@
+{
+  "title": "Youtube Downloader",
+  "helloWorld": "Ciao mondo!",
+
+  "settings": "Impostazioni",
+  "darkMode": "Modalità scura",
+  "ffmpegContainer": "ffmpeg container",
+  "ffmpegDescription": "Il format di output quando due tracce (audio + video) vengono unite",
+  "language": "Lingua",
+  "downloadDir": "Cartella Download",
+  "selectDownloadDir": "Selezione la cartella per i download",
+  "invalidDir": "Cartella non valida",
+
+
+  "downloads": "Downloads",
+  "author": "Autore"
+}

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "net.hexah" "\0"
-            VALUE "FileDescription", "A new Flutter project." "\0"
+            VALUE "FileDescription", "Utility to download videos from YouTube." "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "youtube_downloader_flutter" "\0"
+            VALUE "InternalName", "Youtube Downloader" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2021 net.hexah. All rights reserved." "\0"
-            VALUE "OriginalFilename", "youtube_downloader_flutter.exe" "\0"
-            VALUE "ProductName", "youtube_downloader_flutter" "\0"
+            VALUE "OriginalFilename", "Youtube Downloader.exe" "\0"
+            VALUE "ProductName", "Youtube Downloader Flutter" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
