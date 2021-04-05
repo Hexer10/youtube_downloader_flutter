@@ -15,7 +15,7 @@ class DownloadManager extends ChangeNotifier {
   DownloadManager();
 
   Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
-          {StreamInfo? singleStream, StreamMerge? merger}) =>
+          {StreamInfo? singleStream, StreamMerge? merger, String? ffmpegContainer}) =>
       throw UnimplementedError();
 
   Future<void> removeVideo(DownloadVideo video) => throw UnimplementedError();
@@ -94,9 +94,9 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
   @override
   Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
-      {StreamInfo? singleStream, StreamMerge? merger}) async {
+      {StreamInfo? singleStream, StreamMerge? merger, String? ffmpegContainer}) async {
     assert(singleStream != null || merger != null);
-    assert(merger == null || merger.video != null && merger.audio != null);
+    assert(merger == null || merger.video != null && merger.audio != null && ffmpegContainer != null);
 
     final isMerging = singleStream == null;
     final stream = singleStream ?? merger!.video!;
@@ -113,7 +113,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       merger!;
 
       final downloadPath = await getValidPath(
-          '${path.join(saveDir, video.title.replaceAll(invalidChars, '_'))}.mp4');
+          '${path.join(saveDir, video.title.replaceAll(invalidChars, '_'))}$ffmpegContainer');
 
       final audioTrack =
           processTrack(yt, merger.audio!, saveDir, stream.container.name);
@@ -167,6 +167,13 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
             await File(audioTrack.path).delete();
             await File(videoTrack.path).delete();
+          });
+
+          process.stdout.listen((event) {
+            print('OUT: ${utf8.decode(event)}');
+          });
+          process.stderr.listen((event) {
+            print('ERR: ${utf8.decode(event)}');
           });
 
           muxedTrack._cancelCallback = () async {

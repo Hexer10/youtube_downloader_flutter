@@ -137,7 +137,7 @@ class StreamsList extends HookWidget {
                       const EdgeInsets.all(20))),
               onPressed: () {
                 downloadManager.downloadStream(yt, video, settings.downloadPath,
-                    merger: merger);
+                    merger: merger, ffmpegContainer: settings.ffmpegContainer);
               },
               child: const Text('Download & Merge tracks!')),
         DropdownButton<Filter>(

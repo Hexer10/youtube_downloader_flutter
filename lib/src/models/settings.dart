@@ -8,8 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Settings {
   const Settings();
 
-  SettingsImpl copyWith({String? downloadPath, ThemeSetting? theme}) =>
+  SettingsImpl copyWith({String? downloadPath, ThemeSetting? theme, String? ffmpegContainer}) =>
       throw UnimplementedError();
+
+  String get ffmpegContainer => throw UnimplementedError();
 
   String get downloadPath => throw UnimplementedError();
 
@@ -25,18 +27,24 @@ class SettingsImpl implements Settings {
   @override
   final ThemeSetting theme;
 
-  SettingsImpl._(this._prefs, this.downloadPath, this.theme);
+  @override
+  final String ffmpegContainer;
+
+  SettingsImpl._(this._prefs, this.downloadPath, this.theme, this.ffmpegContainer);
 
   @override
-  SettingsImpl copyWith({String? downloadPath, ThemeSetting? theme}) {
+  SettingsImpl copyWith({String? downloadPath, ThemeSetting? theme, String? ffmpegContainer}) {
     if (downloadPath != null) {
       _prefs.setString('download_path', downloadPath);
     }
     if (theme != null) {
       _prefs.setInt('theme_id', theme.id);
     }
+    if (ffmpegContainer != null) {
+      _prefs.setString('ffmpeg_container', ffmpegContainer);
+    }
     return SettingsImpl._(
-        _prefs, downloadPath ?? this.downloadPath, theme ?? this.theme);
+        _prefs, downloadPath ?? this.downloadPath, theme ?? this.theme, ffmpegContainer ?? this.ffmpegContainer);
   }
 
   static Future<SettingsImpl> init(SharedPreferences prefs) async {
@@ -50,7 +58,12 @@ class SettingsImpl implements Settings {
       themeId = 0;
       prefs.setInt('theme_id', 0);
     }
-    return SettingsImpl._(prefs, path, ThemeSetting.fromId(themeId));
+    var ffmpegContainer = prefs.getString('ffmpeg_container');
+    if (ffmpegContainer == null) {
+      ffmpegContainer = '.mp4';
+      prefs.setString('ffmpeg_container', '.mp4');
+    }
+    return SettingsImpl._(prefs, path, ThemeSetting.fromId(themeId), ffmpegContainer);
   }
 }
 

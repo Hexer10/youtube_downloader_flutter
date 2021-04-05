@@ -12,6 +12,12 @@ import '../providers.dart';
 class SettingsPage extends HookWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
+  static const ffmpegContainers = <DropdownMenuItem<String>>[
+    DropdownMenuItem(value: '.mp4', child: Text('.mp4')),
+    DropdownMenuItem(value: '.webm', child: Text('.webm')),
+    DropdownMenuItem(value: '.mkv', child: Text('.mkv'))
+  ];
+
   @override
   Widget build(BuildContext context) {
     final settings = useProvider(settingsProvider);
@@ -63,7 +69,23 @@ class SettingsPage extends HookWidget {
                 settings.state = settings.state.copyWith(downloadPath: result);
               }
             },
-          )
+          ),
+          const Divider(
+            height: 0,
+          ),
+          ListTile(
+            title: const Text('ffmpeg container'),
+            subtitle: const Text(
+                'This is the output format when two tracks (audio + video) are merged.'),
+            leading: const Icon(CupertinoIcons.moon),
+            trailing: DropdownButton(
+              value: settings.state.ffmpegContainer,
+              onChanged: (String? value) => settings.state = settings.state.copyWith(ffmpegContainer: value),
+              items: ffmpegContainers,
+            ),
+            onTap: () => themeOnChanged(
+                settings, settings.state.theme != ThemeSetting.dark),
+          ),
         ],
       ),
     );
