@@ -11,10 +11,10 @@ class HomePage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Here goes the logo?')),
-      drawer: AppDrawer(),
-      appBar: PreferredSize(
+    return Scaffold(
+      body: Center(child: Text(AppLocalizations.of(context)!.startSearch)),
+      drawer: const AppDrawer(),
+      appBar: const PreferredSize(
           preferredSize: Size.fromHeight(kToolbarHeight), child: SearchBar()),
     );
   }
