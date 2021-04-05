@@ -11,7 +11,7 @@ import '../shared.dart';
 class StreamsList extends HookWidget {
   final Video video;
 
-  const StreamsList(this.video);
+  StreamsList(this.video);
 
   static const List<DropdownMenuItem<Filter>> items = [
     DropdownMenuItem(
@@ -32,6 +32,8 @@ class StreamsList extends HookWidget {
     ),
   ];
 
+  final mergeTracks = StreamMerge();
+
   @override
   Widget build(BuildContext context) {
     final yt = useProvider(ytProvider);
@@ -39,6 +41,8 @@ class StreamsList extends HookWidget {
     final downloadManager = useProvider(downloadProvider).state;
 
     final filter = useState(Filter.all);
+    final merger = useListenable(mergeTracks);
+
     final manifest = useMemoFuture(
         () => yt.videos.streamsClient.getManifest(video.id),
         initialData: null,
@@ -70,11 +74,8 @@ class StreamsList extends HookWidget {
                 return MaterialButton(
                   onPressed: () {
                     downloadManager.downloadStream(
-                        yt,
-                        video,
-                        stream,
-                        settings.downloadPath,
-                        Theme.of(context).textTheme.bodyText1);
+                        yt, video, settings.downloadPath,
+                        singleStream: stream);
                   },
                   child: ListTile(
                     subtitle: Text(
@@ -86,37 +87,41 @@ class StreamsList extends HookWidget {
               }
               if (stream is VideoOnlyStreamInfo) {
                 return MaterialButton(
+                  onLongPress: () {
+                    merger.video = stream;
+                  },
                   onPressed: () {
                     downloadManager.downloadStream(
-                        yt,
-                        video,
-                        stream,
-                        settings.downloadPath,
-                        Theme.of(context).textTheme.bodyText1);
+                        yt, video, settings.downloadPath,
+                        singleStream: stream);
                   },
                   child: ListTile(
                     subtitle: Text(
                         '${stream.videoQualityLabel} - ${stream.videoCodec}'),
                     title: Text(
                         'Video Only (.${stream.container}) - ${bytesToString(stream.size.totalBytes)}'),
+                    trailing:
+                        stream == merger.video ? const Icon(Icons.done) : null,
                   ),
                 );
               }
               if (stream is AudioOnlyStreamInfo) {
                 return MaterialButton(
+                  onLongPress: () {
+                    merger.audio = stream;
+                  },
                   onPressed: () {
                     downloadManager.downloadStream(
-                        yt,
-                        video,
-                        stream,
-                        settings.downloadPath,
-                        Theme.of(context).textTheme.bodyText1);
+                        yt, video, settings.downloadPath,
+                        singleStream: stream);
                   },
                   child: ListTile(
                     subtitle: Text(
                         '${stream.audioCodec} | Bitrate: ${stream.bitrate}'),
                     title: Text(
                         'Audio Only (.${stream.container}) - ${bytesToString(stream.size.totalBytes)}'),
+                    trailing:
+                        stream == merger.audio ? const Icon(Icons.done) : null,
                   ),
                 );
               }
@@ -125,13 +130,23 @@ class StreamsList extends HookWidget {
             }),
       ),
       actions: <Widget>[
+        if (merger.audio != null && merger.video != null)
+          OutlinedButton(
+              style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                      const EdgeInsets.all(20))),
+              onPressed: () {
+                downloadManager.downloadStream(yt, video, settings.downloadPath,
+                    merger: merger);
+              },
+              child: const Text('Download & Merge tracks!')),
         DropdownButton<Filter>(
           value: filter.value,
           items: items,
           onChanged: (newFilter) {
             filter.value = newFilter!;
           },
-        )
+        ),
       ],
     );
   }

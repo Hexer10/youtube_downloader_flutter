@@ -9,6 +9,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../providers.dart';
 import 'streams_list.dart';
 
+// TODO: Maybe exist ChangeNotifier
 class SearchService {
   final YoutubeExplode yt;
   final String query;

@@ -28,7 +28,29 @@ class DownloadTile extends HookWidget {
         title: Text(video.title),
         subtitle: Text(video.path),
         trailing: TrailingIcon(video),
-        leading: Text('${video.downloadPerc}%'));
+        leading: LeadingIcon(video));
+  }
+}
+
+class LeadingIcon extends HookWidget {
+  final DownloadVideo video;
+
+  const LeadingIcon(this.video, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    switch (video.downloadStatus) {
+      case DownloadStatus.downloading:
+        return Text('${video.downloadPerc}%');
+      case DownloadStatus.success:
+        return const Icon(Icons.done);
+      case DownloadStatus.failed:
+        return const Icon(Icons.error);
+      case DownloadStatus.muxing:
+        return const CircularProgressIndicator();
+      case DownloadStatus.canceled:
+        return const Icon(Icons.cancel);
+    }
   }
 }
 
@@ -71,7 +93,11 @@ class TrailingIcon extends HookWidget {
           ],
         );
       case DownloadStatus.failed:
-        return const Text('Something went wrong!');
+        return Text(video.error);
+      case DownloadStatus.muxing:
+        return const Text('Merging!');
+      case DownloadStatus.canceled:
+        return const Text('Canceled!');
     }
   }
 }

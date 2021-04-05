@@ -12,5 +12,5 @@ final settingsProvider = StateProvider<Settings>(
     name: 'Settings Provider');
 
 final downloadProvider = StateProvider<DownloadManager>(
-        (ref) => const DownloadManager(),
+        (ref) => DownloadManager(),
     name: 'DownloadManager Provider');

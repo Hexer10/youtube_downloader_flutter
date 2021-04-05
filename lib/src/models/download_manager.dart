@@ -11,11 +11,11 @@ import 'package:path/path.dart' as path;
 
 part 'download_manager.g.dart';
 
-class DownloadManager {
-  const DownloadManager();
+class DownloadManager extends ChangeNotifier  {
+  DownloadManager();
 
-  void downloadStream(YoutubeExplode yt, Video video, StreamInfo stream,
-      String saveDir, TextStyle? style) =>
+  Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
+          {StreamInfo? singleStream, StreamMerge? merger}) =>
       throw UnimplementedError();
 
   Future<void> removeVideo(DownloadVideo video) => throw UnimplementedError();
@@ -23,7 +23,9 @@ class DownloadManager {
   List<DownloadVideo> get videos => throw UnimplementedError();
 }
 
-class DownloadManagerImpl implements DownloadManager {
+class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
+  static final invalidChars = RegExp(r'[\\\/:*?"<>|]');
+
   final SharedPreferences _prefs;
 
   @override
@@ -41,21 +43,23 @@ class DownloadManagerImpl implements DownloadManager {
 
   DownloadManagerImpl._(this._prefs, this._nextId, this.videoIds, this.videos);
 
-  static final invalidChars = RegExp(r'[\\\/:*?"<>|]');
-
   void addVideo(DownloadVideo video) {
     final id = 'video_${video.id}';
     videoIds.add(id);
 
     _prefs.setStringList('video_list', videoIds);
     _prefs.setString(id, json.encode(video));
+
+    notifyListeners();
   }
 
   @override
   Future<void> removeVideo(DownloadVideo video) async {
     final id = 'video_${video.id}';
+
     videoIds.remove(id);
-    videos.remove(video);
+    videos.removeWhere((e) => e.id == video.id);
+
     _prefs.setStringList('video_list', videoIds);
     _prefs.remove(id);
 
@@ -63,81 +67,215 @@ class DownloadManagerImpl implements DownloadManager {
     if (await file.exists()) {
       await file.delete();
     }
+
+    notifyListeners();
+  }
+
+  Future<String> getValidPath(String strPath) async {
+    final file = File(strPath);
+    if (!(await file.exists())) {
+      return strPath;
+    }
+    final basename = path.withoutExtension(strPath);
+    final ext = path.extension(strPath);
+    var count = 0;
+
+    while (true) {
+      final newPath = '$basename (${++count})$ext';
+      final file = File(newPath);
+      if (await file.exists()) {
+        continue;
+      }
+      return newPath;
+    }
   }
 
   @override
-  Future<void> downloadStream(YoutubeExplode yt, Video video, StreamInfo stream,
-      String saveDir, TextStyle? style) async {
+  Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
+      {StreamInfo? singleStream, StreamMerge? merger}) async {
+    assert(singleStream != null || merger != null);
+    assert(merger == null || merger.video != null && merger.audio != null);
+
+    final isMerging = singleStream == null;
+    final stream = singleStream ?? merger!.video!;
     final id = nextId;
 
-    final downloadPath =
-        '${path.join(
-        saveDir, video.title.replaceAll(invalidChars, '_'))}${'.${stream
-        .container.name}'}';
-    final tempPath = path.join(saveDir, 'Unconfirmed $id.ytdownload');
+    if (isMerging) {
+      final process = await Process.run('ffmpeg', [], runInShell: true);
+      if ((process.stderr as String)
+          .startsWith("'ffmpeg'  is not recognized as an internal")) {
+        //TODO: Show dialog/snackbar
+        print('ffmpeg not found');
+        return;
+      }
+      merger!;
 
-    print('Saving to: $downloadPath ($tempPath)');
+      final downloadPath = await getValidPath(
+          '${path.join(saveDir, video.title.replaceAll(invalidChars, '_'))}.mp4');
+
+      final audioTrack =
+          processTrack(yt, merger.audio!, saveDir, stream.container.name);
+      final videoTrack =
+          processTrack(yt, merger.video!, saveDir, stream.container.name);
+      final muxedTrack = DownloadVideoTracks(
+          id,
+          downloadPath,
+          video.title,
+          bytesToString(videoTrack.totalSize + audioTrack.totalSize),
+          videoTrack.totalSize + audioTrack.totalSize,
+          audioTrack,
+          videoTrack,
+          prefs: _prefs);
+      muxedTrack._cancelCallback = () {
+        audioTrack._cancelCallback!();
+        videoTrack._cancelCallback!();
+
+        muxedTrack.downloadStatus = DownloadStatus.canceled;
+      };
+
+      Future<void> downloadListener() async {
+        muxedTrack.downloadPerc =
+            ((audioTrack.downloadPerc + videoTrack.downloadPerc) / 2).round();
+        if (audioTrack.downloadStatus == DownloadStatus.success &&
+            videoTrack.downloadStatus == DownloadStatus.success) {
+          muxedTrack.downloadStatus = DownloadStatus.muxing;
+          final process = await Process.start(
+              'ffmpeg',
+              [
+                '-i',
+                audioTrack.path,
+                '-i',
+                videoTrack.path,
+                '-shortest',
+                muxedTrack.path
+              ],
+              runInShell: true);
+          process.exitCode.then((exitCode) async {
+            print('Completed with: $exitCode');
+            muxedTrack.downloadStatus = DownloadStatus.success;
+
+            audioTrack.removeListener(downloadListener);
+            videoTrack.removeListener(downloadListener);
+
+            await File(audioTrack.path).delete();
+            await File(videoTrack.path).delete();
+          });
+
+          muxedTrack._cancelCallback = () async {
+            audioTrack._cancelCallback!();
+            videoTrack._cancelCallback!();
+
+            process.kill();
+            await File(muxedTrack.path).delete();
+            muxedTrack.downloadStatus = DownloadStatus.canceled;
+          };
+        }
+      }
+
+      audioTrack.addListener(downloadListener);
+      videoTrack.addListener(downloadListener);
+
+      addVideo(muxedTrack);
+      videos.add(muxedTrack);
+
+      showSnackbar(Text('Started downloading: ${video.title}'));
+    } else {
+      final downloadPath = await getValidPath(
+          '${path.join(saveDir, video.title.replaceAll(invalidChars, '_'))}${'.${stream.container.name}'}');
+
+      final tempPath = path.join(saveDir, 'Unconfirmed $id.ytdownload');
+
+      print('Saving to: $downloadPath ($tempPath)');
+
+      final file = File(tempPath);
+      final sink = file.openWrite();
+      final dataStream = yt.videos.streamsClient.get(stream);
+
+      final downloadVideo = DownloadVideo(id, downloadPath, video.title,
+          bytesToString(stream.size.totalBytes), stream.size.totalBytes,
+          prefs: _prefs);
+
+      addVideo(downloadVideo);
+      videos.add(downloadVideo);
+
+      final sub = dataStream
+          .listen((data) => handleData(data, sink, downloadVideo),
+              onError: (error, __) async {
+        //TODO: Show the error in the downloads page.
+        showSnackbar(Text('${video.title} download failed!'));
+        await cleanUp(sink, file);
+        downloadVideo.downloadStatus = DownloadStatus.failed;
+        downloadVideo.error = error.toString();
+      }, onDone: () async {
+        await cleanUp(sink, file, downloadPath);
+        downloadVideo.downloadStatus = DownloadStatus.success;
+        showSnackbar(Text('${video.title} download finished!'));
+      }, cancelOnError: true);
+
+      downloadVideo._cancelCallback = () async {
+        print('Video canceled');
+        await cleanUp(sink, file);
+        downloadVideo.downloadStatus = DownloadStatus.canceled;
+        sub.cancel();
+      };
+
+      showSnackbar(Text('Started downloading: ${video.title}'));
+    }
+  }
+
+  DownloadVideo processTrack(
+      YoutubeExplode yt, StreamInfo stream, String saveDir, String container) {
+    final id = nextId;
+    final tempPath =
+        path.join(saveDir, 'Unconfirmed $id.ytdownload.$container');
 
     final file = File(tempPath);
     final sink = file.openWrite();
-    var totalBytes = 0;
-    final dataStream = yt.videos.streamsClient.get(stream);
-    var progress = -1;
 
-    final downloadVideo = DownloadVideo(
-        id, downloadPath, video.title, bytesToString(stream.size.totalBytes),
+    final downloadVideo = DownloadVideo(id, tempPath, 'Temp$id',
+        bytesToString(stream.size.totalBytes), stream.size.totalBytes,
         prefs: _prefs);
 
-    addVideo(downloadVideo);
-    videos.add(downloadVideo);
-
-    final sub = dataStream.listen(
-            (bytes) {
-          sink.add(bytes);
-          totalBytes += bytes.length;
-          final newProgress =
-          (totalBytes / stream.size.totalBytes * 100).floor();
-          if (newProgress == progress) {
-            return;
-          }
-          downloadVideo.downloadPerc = progress + 1;
-          progress = newProgress;
-          print(
-              'Progress: ${bytesToString(totalBytes)} / ${bytesToString(
-                  stream.size.totalBytes)} ($progress)');
-        },
-        cancelOnError: true,
-        onError: (error, stack) async {
-          showSnackbar(
-              Text('${video.title} download failed!', style: style));
-          print('Error occurred: $error\n$stack');
-          await sink.flush();
-          await sink.close();
-          await file.delete();
-          downloadVideo.downloadStatus = DownloadStatus.failed;
-        },
-        onDone: () async {
-          print('Done!');
-
-          await sink.flush();
-          await sink.close();
-          await file.rename(downloadPath);
-          downloadVideo.downloadStatus = DownloadStatus.success;
-          showSnackbar(
-              Text('${video.title} download finished!', style: style));
-        });
-    downloadVideo._cancelCallback = () async {
-      print('Video canceled');
+    final dataStream = yt.videos.streamsClient.get(stream);
+    final sub = dataStream
+        .listen((data) => handleData(data, sink, downloadVideo),
+            onError: (error, __) async {
+      await cleanUp(sink, file);
+      downloadVideo.downloadStatus = DownloadStatus.failed;
+      downloadVideo.error = error.toString();
+    }, onDone: () async {
       await sink.flush();
       await sink.close();
-      await file.delete();
-      downloadVideo.downloadStatus = DownloadStatus.failed;
+      downloadVideo.downloadStatus = DownloadStatus.success;
+    }, cancelOnError: true);
+
+    downloadVideo._cancelCallback = () async {
+      await cleanUp(sink, file);
+      downloadVideo.downloadStatus = DownloadStatus.canceled;
       sub.cancel();
     };
+    return downloadVideo;
+  }
 
-    showSnackbar(
-        Text('Started downloading: ${video.title}', style: style));
+  void handleData(List<int> bytes, IOSink sink, DownloadVideo video) {
+    sink.add(bytes);
+    video.downloadedBytes += bytes.length;
+    final newProgress = (video.downloadedBytes / video.totalSize * 100).floor();
+    video.downloadPerc = newProgress;
+  }
+
+  /// Flushes and closes the sink.
+  /// If path is specified the file is moved to that path, otherwise is it deleted.
+  Future<void> cleanUp(IOSink sink, File file, [String? path]) async {
+    await sink.flush();
+    await sink.close();
+    if (path != null) {
+      final oldFile = file.path;
+      await file.rename(path);
+      return;
     }
+    await file.delete();
+  }
 
   factory DownloadManagerImpl.init(SharedPreferences prefs) {
     var videoIds = prefs.getStringList('video_list');
@@ -161,35 +299,52 @@ class DownloadManagerImpl implements DownloadManager {
 }
 
 @JsonSerializable()
-class DownloadVideo extends Listenable {
+class DownloadVideo extends ChangeNotifier {
   final int id;
   final String path;
   final String title;
   final String size;
+  final int totalSize;
 
   int _downloadPerc = 0;
   DownloadStatus _downloadStatus = DownloadStatus.downloading;
+  int _downloadedBytes = 0;
+  String _error = '';
 
   int get downloadPerc => _downloadPerc;
 
   DownloadStatus get downloadStatus => _downloadStatus;
 
+  int get downloadedBytes => _downloadedBytes;
+
+  String get error => _error;
+
   set downloadPerc(int value) {
     _downloadPerc = value;
-    _prefs?.setString('video_$id', json.encode(this));
 
-    for (final e in listeners) {
-      e();
-    }
+    _prefs?.setString('video_$id', json.encode(this));
+    notifyListeners();
   }
 
   set downloadStatus(DownloadStatus value) {
     _downloadStatus = value;
+
+    _prefs?.setString('video_$id', json.encode(this));
+    notifyListeners();
+  }
+
+  set downloadedBytes(int value) {
+    _downloadedBytes = value;
+
+    _prefs?.setString('video_$id', json.encode(this));
+    notifyListeners();
+  }
+
+  set error(String value) {
+    _error = value;
     _prefs?.setString('video_$id', json.encode(this));
 
-    for (final e in listeners) {
-      e();
-    }
+    notifyListeners();
   }
 
   @JsonKey(ignore: true)
@@ -198,10 +353,7 @@ class DownloadVideo extends Listenable {
   @JsonKey(ignore: true)
   final SharedPreferences? _prefs;
 
-  @JsonKey(ignore: true)
-  final List<VoidCallback> listeners = [];
-
-  DownloadVideo(this.id, this.path, this.title, this.size,
+  DownloadVideo(this.id, this.path, this.title, this.size, this.totalSize,
       {SharedPreferences? prefs})
       : _prefs = prefs;
 
@@ -217,19 +369,49 @@ class DownloadVideo extends Listenable {
     }
     _cancelCallback!();
   }
-
-  @override
-  void addListener(VoidCallback listener) {
-    listeners.add(listener);
-  }
-
-  @override
-  void removeListener(VoidCallback listener) {
-    listeners.remove(listener);
-  }
 }
 
-enum DownloadStatus { downloading, success, failed }
+/// Used when downloading both Video and Audio tracks to be merged.
+@JsonSerializable()
+class DownloadVideoTracks extends DownloadVideo {
+  final DownloadVideo audio;
+  final DownloadVideo video;
+
+  DownloadVideoTracks(int id, String path, String title, String size,
+      int totalSize, this.audio, this.video,
+      {SharedPreferences? prefs})
+      : super(id, path, title, size, totalSize, prefs: prefs);
+
+  factory DownloadVideoTracks.fromJson(Map<String, dynamic> json) =>
+      _$DownloadVideoTracksFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$DownloadVideoTracksToJson(this);
+}
+
+class StreamMerge extends ChangeNotifier {
+  AudioOnlyStreamInfo? _audio;
+
+  AudioOnlyStreamInfo? get audio => _audio;
+
+  set audio(AudioOnlyStreamInfo? audio) {
+    _audio = audio;
+    notifyListeners();
+  }
+
+  VideoOnlyStreamInfo? _video;
+
+  VideoOnlyStreamInfo? get video => _video;
+
+  set video(VideoOnlyStreamInfo? video) {
+    _video = video;
+    notifyListeners();
+  }
+
+  StreamMerge();
+}
+
+enum DownloadStatus { downloading, success, failed, muxing, canceled }
 
 String bytesToString(int bytes) {
   final totalKiloBytes = bytes / 1024;

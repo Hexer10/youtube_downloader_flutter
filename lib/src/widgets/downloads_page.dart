@@ -11,6 +11,8 @@ class DownloadsPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final downloadManager = useProvider(downloadProvider).state;
+    useListenable(downloadManager);
+
     final length = downloadManager.videos.length;
 
     return Scaffold(
@@ -18,7 +20,9 @@ class DownloadsPage extends HookWidget {
           preferredSize: Size.fromHeight(kToolbarHeight),
           child: DownloadsAppBar()),
       body: ListView.separated(
-        separatorBuilder: (BuildContext context, int index) => const Divider(height: 0,),
+        separatorBuilder: (BuildContext context, int index) => const Divider(
+          height: 0,
+        ),
         itemCount: length,
         itemBuilder: (BuildContext context, int index) {
           final video = downloadManager.videos[(length - 1) - index];
@@ -27,7 +31,6 @@ class DownloadsPage extends HookWidget {
       ),
     );
   }
-
 }
 
 class DownloadsAppBar extends HookWidget {
