@@ -21,7 +21,7 @@ Then locate and run the app (ie in windows it is located inside build\windows\ru
  - [ ] Show notification when a file is being downloaded/has finished downloading ([#9](https://github.com/Hexer10/youtube_downloader_flutter/issues/9)).
  - [ ] Implement GitHub Actions and upload the binaries as articats ([#6](https://github.com/Hexer10/youtube_downloader_flutter/issues/6)).
  - [ ] Implement `flutter_ffmpeg` for IOS/Android ([#8](https://github.com/Hexer10/youtube_downloader_flutter/issues/8))
-
+ - [ ] Parse playlists / channel uploads.
 ## Screenshots
 
 <img width="288" alt="HomePage" src="https://user-images.githubusercontent.com/21113203/113563902-c7beb100-9608-11eb-845a-4bad383d2e6b.PNG">
