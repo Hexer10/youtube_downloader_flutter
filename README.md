@@ -17,10 +17,10 @@ Then from inside the project directory run:
 Then locate and run the app (ie in windows it is located inside build\windows\runner\Release).
 
 ## Todos / Known issues
- - [ ] Directory finder inside settings doesn't work in MacOS/Linux.
- - [ ] Show notification when a file is being downloaded/has finished downloading.
- - [ ] Implement GitHub Actions and upload the binaries as articats.
- - [ ] Implement `flutter_ffmpeg` for IOS/Android
+ - [ ] Directory finder inside settings doesn't work in MacOS/Linux. ([#7](https://github.com/Hexer10/youtube_downloader_flutter/issues/7)).
+ - [ ] Show notification when a file is being downloaded/has finished downloading ([#9](https://github.com/Hexer10/youtube_downloader_flutter/issues/9)).
+ - [ ] Implement GitHub Actions and upload the binaries as articats ([#6](https://github.com/Hexer10/youtube_downloader_flutter/issues/6)).
+ - [ ] Implement `flutter_ffmpeg` for IOS/Android ([#8](https://github.com/Hexer10/youtube_downloader_flutter/issues/8))
 
 ## Screenshots
 
