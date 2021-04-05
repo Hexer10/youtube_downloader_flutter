@@ -1,6 +1,6 @@
 # Youtube Downloader Flutter
 
-This is a cross platform app to download videos from YouTube, it's still a WIP. It is mostly e remake of [YoutubeDownloader](https://github.com/Tyrrrz/YoutubeDownloader).
+This is a cross platform app (currently tested on Android and Windows) to download videos from YouTube, it's still a WIP. It is mostly e remake of [YoutubeDownloader](https://github.com/Tyrrrz/YoutubeDownloader).
 You can search a video from YouTube (within the app) and chose which stream you'd like to download.
 If FFMPEG is added to the path you can long-press two tiles (audio and video), and those tracks will be merged into one, remember that muxed tracks (the ones with already audio + video, have a poor quality).
 
@@ -17,9 +17,10 @@ Then from inside the project directory run:
 Then locate and run the app (ie in windows it is located inside build\windows\runner\Release).
 
 ## Todos / Known issues
-[] Directory finder inside settings doesn't work in MacOS/Linux.
-[] Show notification when a file is being downloaded/has finished downloading.
-[] Implement GitHub Actions and upload the binaries as articatifacts/
+ - [ ] Directory finder inside settings doesn't work in MacOS/Linux.
+ - [ ] Show notification when a file is being downloaded/has finished downloading.
+ - [ ] Implement GitHub Actions and upload the binaries as articats.
+ - [ ] Implement `flutter_ffmpeg` for IOS/Android
 
 ## Screenshots
 
