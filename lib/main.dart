@@ -92,43 +92,16 @@ class AppInit extends HookWidget {
           debugShowCheckedModeBanner: false,
           home: const HomePage(),
           localizationsDelegates: const [
+
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: Settings.locales,
+          supportedLocales: AppLocalizations.supportedLocales,
           locale: settings.state.locale,
           title: 'Youtube Downloader',
           theme: settings.state.theme.themeData,
         );
-
-    /*return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Overlay(
-        key: overlayKey,
-        initialEntries: [
-          OverlayEntry(
-              builder: (context) => MaterialApp(
-                    localizationsDelegates: const [
-                      AppLocalizations.delegate,
-                      GlobalMaterialLocalizations.delegate,
-                      GlobalWidgetsLocalizations.delegate,
-                      GlobalCupertinoLocalizations.delegate,
-                    ],
-                    supportedLocales: Settings.locales,
-                    locale: settings.state.locale,
-                    debugShowCheckedModeBanner: false,
-                    title: 'Youtube Downloader',
-                    theme: settings.state.theme.themeData,
-                    home: const HomePage(),
-                  )),
-          OverlayEntry(builder: (context) => Positioned(
-              bottom: 0,
-              left: 0,
-              child: Container(width: 30, height: 30, color: Colors.red,)))
-        ],
-      ),
-    );*/
   }
 }

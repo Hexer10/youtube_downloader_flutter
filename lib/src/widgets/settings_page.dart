@@ -20,10 +20,10 @@ class SettingsPage extends HookWidget {
     DropdownMenuItem(value: '.mkv', child: Text('.mkv'))
   ];
 
-  final locales = Settings.locales
+
+  final locales = AppLocalizations.supportedLocales
       .map((e) => DropdownMenuItem(value: e, child: Text(e.languageCode)))
       .toList();
-
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +55,7 @@ class SettingsPage extends HookWidget {
             subtitle: Text(settings.state.downloadPath),
             onTap: () async {
               if (Platform.isWindows) {
-                final file = DirectoryPicker()
-                  ..title = intl.selectDownloadDir;
+                final file = DirectoryPicker()..title = intl.selectDownloadDir;
 
                 final result = file.getDirectory();
                 if (result == null) {

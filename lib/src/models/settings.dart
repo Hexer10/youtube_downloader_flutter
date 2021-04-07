@@ -22,11 +22,6 @@ class Settings {
   ThemeSetting get theme => throw UnimplementedError();
 
   Locale get locale => throw UnimplementedError();
-
-  static const List<Locale> locales = [
-    Locale('en', ''),
-    Locale('it', ''),
-  ];
 }
 
 class SettingsImpl implements Settings {

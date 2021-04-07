@@ -12,5 +12,65 @@
   "invalidDir": "Invalid directory",
 
   "downloads": "Downloads",
-  "author": "Author"
+  "author": "Author",
+
+  "startDownload": "Started downloading: {title}",
+  "@startDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "failDownload": "Downloading failed: {title}",
+  "@failDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "cancelDownload": "Downloading cancelled: {title}",
+  "@cancelDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "finishDownload": "Downloading finished: {title}",
+  "@finishDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "startMerge": "Merging tracks of: {title}",
+  "@startMerge": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "finishMerge": "Merge finished: {title}",
+  "@finishMerge": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  }
 }

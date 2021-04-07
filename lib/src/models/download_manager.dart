@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_downloader_flutter/main.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:path/path.dart' as path;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'settings.dart';
 
@@ -18,6 +19,7 @@ class DownloadManager extends ChangeNotifier {
   DownloadManager();
 
   Future<void> downloadStream(YoutubeExplode yt, Video video, Settings settings,
+          AppLocalizations localizations,
           {StreamInfo? singleStream,
           StreamMerge? merger,
           String? ffmpegContainer}) =>
@@ -100,6 +102,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
   @override
   Future<void> downloadStream(YoutubeExplode yt, Video video, Settings settings,
+      AppLocalizations localizations,
       {StreamInfo? singleStream,
       StreamMerge? merger,
       String? ffmpegContainer}) async {
@@ -127,10 +130,10 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       final downloadPath = await getValidPath(
           '${path.join(settings.downloadPath, video.title.replaceAll(invalidChars, '_'))}$ffmpegContainer');
 
-      final audioTrack =
-          processTrack(yt, merger.audio!, saveDir, stream.container.name);
-      final videoTrack =
-          processTrack(yt, merger.video!, saveDir, stream.container.name);
+      final audioTrack = processTrack(yt, merger.audio!, saveDir,
+          stream.container.name, video, localizations);
+      final videoTrack = processTrack(yt, merger.video!, saveDir,
+          stream.container.name, video, localizations);
       final muxedTrack = DownloadVideoTracks(
           id,
           downloadPath,
@@ -199,7 +202,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       showSnackbar(SnackBar(
         content: Theme(
             data: settings.theme.themeData,
-            child: Text('Started downloading: ${video.title}')),
+            child: Text(localizations.startDownload(video.title))),
         backgroundColor: settings.theme.themeData.snackBarTheme.backgroundColor,
       ));
     } else {
@@ -207,8 +210,6 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
           '${path.join(saveDir, video.title.replaceAll(invalidChars, '_'))}${'.${stream.container.name}'}');
 
       final tempPath = path.join(saveDir, 'Unconfirmed $id.ytdownload');
-
-      print('Saving to: $downloadPath ($tempPath)');
 
       final file = File(tempPath);
       final sink = file.openWrite();
@@ -225,7 +226,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
           .listen((data) => handleData(data, sink, downloadVideo),
               onError: (error, __) async {
         showSnackbar(
-            SnackBar(content: Text('${video.title} download failed!')));
+            SnackBar(content: Text(localizations.failDownload(video.title))));
         await cleanUp(sink, file);
         downloadVideo.downloadStatus = DownloadStatus.failed;
         downloadVideo.error = error.toString();
@@ -234,27 +235,34 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
         downloadVideo.downloadStatus = DownloadStatus.success;
         downloadVideo.path = newPath!;
         showSnackbar(
-            SnackBar(content: Text('${video.title} download finished!')));
+            SnackBar(content: Text(localizations.finishDownload(video.title))));
       }, cancelOnError: true);
 
       downloadVideo._cancelCallback = () async {
-        print('Video canceled');
         await cleanUp(sink, file);
         downloadVideo.downloadStatus = DownloadStatus.canceled;
         sub.cancel();
+
+        showSnackbar(
+            SnackBar(content: Text(localizations.cancelDownload(video.title))));
       };
 
       showSnackbar(SnackBar(
         content: Theme(
             data: settings.theme.themeData,
-            child: Text('Started downloading: ${video.title}')),
+            child: Text(localizations.startDownload(video.title))),
         backgroundColor: settings.theme.themeData.snackBarTheme.backgroundColor,
       ));
     }
   }
 
   DownloadVideo processTrack(
-      YoutubeExplode yt, StreamInfo stream, String saveDir, String container) {
+      YoutubeExplode yt,
+      StreamInfo stream,
+      String saveDir,
+      String container,
+      Video video,
+      AppLocalizations localizations) {
     final id = nextId;
     final tempPath =
         path.join(saveDir, 'Unconfirmed $id.ytdownload.$container');
@@ -273,10 +281,16 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       await cleanUp(sink, file);
       downloadVideo.downloadStatus = DownloadStatus.failed;
       downloadVideo.error = error.toString();
+
+      showSnackbar(
+          SnackBar(content: Text(localizations.failDownload(video.title))));
     }, onDone: () async {
       await sink.flush();
       await sink.close();
       downloadVideo.downloadStatus = DownloadStatus.success;
+
+      showSnackbar(
+          SnackBar(content: Text(localizations.finishMerge(video.title))));
     }, cancelOnError: true);
 
     downloadVideo._cancelCallback = () async {

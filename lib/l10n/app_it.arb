@@ -13,5 +13,65 @@
 
 
   "downloads": "Downloads",
-  "author": "Autore"
+  "author": "Autore",
+
+  "startDownload": "Inizio download: {title}",
+  "@startDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Nuovo video!",
+        "description": "Titolo del video"
+      }
+    }
+  },
+
+  "failDownload": "Download fallito: {title}",
+  "@failDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Nuovo video!",
+        "description": "Titolo del video"
+      }
+    }
+  },
+
+  "cancelDownload": "Download cancellato: {title}",
+  "@cancelDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "finishDownload": "Download completato: {title}",
+  "@finishDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "startMerge": "Unificando le traccie: {title}",
+  "@startMerge": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "finishMerge": "Video completo: {title}",
+  "@finishMerge": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  }
 }
