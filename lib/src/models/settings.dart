@@ -107,8 +107,21 @@ class ThemeSetting {
   final ThemeData themeData;
 
   static final ThemeSetting light = ThemeSetting._(
-      0, ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white));
-  static final ThemeSetting dark = ThemeSetting._(1, ThemeData.dark());
+      0,
+      ThemeData.light().copyWith(
+          scaffoldBackgroundColor: Colors.white,
+          snackBarTheme: const SnackBarThemeData(
+            backgroundColor: Colors.white70,
+            contentTextStyle: TextStyle(color: Colors.black),
+          )));
+
+  static final ThemeSetting dark = ThemeSetting._(
+      1,
+      ThemeData.dark().copyWith(
+          snackBarTheme: SnackBarThemeData(
+        backgroundColor: Colors.grey[700],
+        contentTextStyle: const TextStyle(color: Colors.white70),
+      )));
 
   const ThemeSetting._(this.id, this.themeData);
 

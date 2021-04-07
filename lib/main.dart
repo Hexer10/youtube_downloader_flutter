@@ -60,6 +60,8 @@ class MainObserver implements ProviderObserver {
 }
 
 class AppInit extends HookWidget {
+  static final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+
   @override
   Widget build(BuildContext context) {
     final fetched = useState<bool>(false);
@@ -83,19 +85,50 @@ class AppInit extends HookWidget {
         ),
       );
     }
+
+    // TODO: Might be worth finding another way to achieve this
     return MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: Settings.locales,
-      locale: settings.state.locale,
-      debugShowCheckedModeBanner: false,
-      title: 'Youtube Downloader',
-      theme: settings.state.theme.themeData,
-      home: const HomePage(),
-    );
+          scaffoldMessengerKey: scaffoldKey,
+          debugShowCheckedModeBanner: false,
+          home: const HomePage(),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: Settings.locales,
+          locale: settings.state.locale,
+          title: 'Youtube Downloader',
+          theme: settings.state.theme.themeData,
+        );
+
+    /*return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Overlay(
+        key: overlayKey,
+        initialEntries: [
+          OverlayEntry(
+              builder: (context) => MaterialApp(
+                    localizationsDelegates: const [
+                      AppLocalizations.delegate,
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate,
+                    ],
+                    supportedLocales: Settings.locales,
+                    locale: settings.state.locale,
+                    debugShowCheckedModeBanner: false,
+                    title: 'Youtube Downloader',
+                    theme: settings.state.theme.themeData,
+                    home: const HomePage(),
+                  )),
+          OverlayEntry(builder: (context) => Positioned(
+              bottom: 0,
+              left: 0,
+              child: Container(width: 30, height: 30, color: Colors.red,)))
+        ],
+      ),
+    );*/
   }
 }

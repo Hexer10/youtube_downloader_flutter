@@ -74,7 +74,7 @@ class StreamsList extends HookWidget {
                 return MaterialButton(
                   onPressed: () {
                     downloadManager.downloadStream(
-                        yt, video, settings.downloadPath,
+                        yt, video, settings,
                         singleStream: stream);
                   },
                   child: ListTile(
@@ -92,7 +92,7 @@ class StreamsList extends HookWidget {
                   },
                   onPressed: () {
                     downloadManager.downloadStream(
-                        yt, video, settings.downloadPath,
+                        yt, video, settings,
                         singleStream: stream);
                   },
                   child: ListTile(
@@ -112,7 +112,7 @@ class StreamsList extends HookWidget {
                   },
                   onPressed: () {
                     downloadManager.downloadStream(
-                        yt, video, settings.downloadPath,
+                        yt, video, settings,
                         singleStream: stream);
                   },
                   child: ListTile(
@@ -136,7 +136,7 @@ class StreamsList extends HookWidget {
                   padding: MaterialStateProperty.all<EdgeInsets>(
                       const EdgeInsets.all(20))),
               onPressed: () {
-                downloadManager.downloadStream(yt, video, settings.downloadPath,
+                downloadManager.downloadStream(yt, video, settings,
                     merger: merger, ffmpegContainer: settings.ffmpegContainer);
               },
               child: const Text('Download & Merge tracks!')),

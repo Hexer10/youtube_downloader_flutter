@@ -6,15 +6,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:youtube_downloader_flutter/main.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:path/path.dart' as path;
+
+import 'settings.dart';
 
 part 'download_manager.g.dart';
 
 class DownloadManager extends ChangeNotifier {
   DownloadManager();
 
-  Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
+  Future<void> downloadStream(YoutubeExplode yt, Video video, Settings settings,
           {StreamInfo? singleStream,
           StreamMerge? merger,
           String? ffmpegContainer}) =>
@@ -96,7 +99,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
   }
 
   @override
-  Future<void> downloadStream(YoutubeExplode yt, Video video, String saveDir,
+  Future<void> downloadStream(YoutubeExplode yt, Video video, Settings settings,
       {StreamInfo? singleStream,
       StreamMerge? merger,
       String? ffmpegContainer}) async {
@@ -109,6 +112,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
     final isMerging = singleStream == null;
     final stream = singleStream ?? merger!.video!;
     final id = nextId;
+    final saveDir = settings.downloadPath;
 
     if (isMerging) {
       final process = await Process.run('ffmpeg', [], runInShell: true);
@@ -121,7 +125,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       merger!;
 
       final downloadPath = await getValidPath(
-          '${path.join(saveDir, video.title.replaceAll(invalidChars, '_'))}$ffmpegContainer');
+          '${path.join(settings.downloadPath, video.title.replaceAll(invalidChars, '_'))}$ffmpegContainer');
 
       final audioTrack =
           processTrack(yt, merger.audio!, saveDir, stream.container.name);
@@ -192,7 +196,12 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       addVideo(muxedTrack);
       videos.add(muxedTrack);
 
-      showSnackbar(Text('Started downloading: ${video.title}'));
+      showSnackbar(SnackBar(
+        content: Theme(
+            data: settings.theme.themeData,
+            child: Text('Started downloading: ${video.title}')),
+        backgroundColor: settings.theme.themeData.snackBarTheme.backgroundColor,
+      ));
     } else {
       final downloadPath = await getValidPath(
           '${path.join(saveDir, video.title.replaceAll(invalidChars, '_'))}${'.${stream.container.name}'}');
@@ -215,7 +224,8 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       final sub = dataStream
           .listen((data) => handleData(data, sink, downloadVideo),
               onError: (error, __) async {
-        showSnackbar(Text('${video.title} download failed!'));
+        showSnackbar(
+            SnackBar(content: Text('${video.title} download failed!')));
         await cleanUp(sink, file);
         downloadVideo.downloadStatus = DownloadStatus.failed;
         downloadVideo.error = error.toString();
@@ -223,7 +233,8 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
         final newPath = await cleanUp(sink, file, downloadPath);
         downloadVideo.downloadStatus = DownloadStatus.success;
         downloadVideo.path = newPath!;
-        showSnackbar(Text('${video.title} download finished!'));
+        showSnackbar(
+            SnackBar(content: Text('${video.title} download finished!')));
       }, cancelOnError: true);
 
       downloadVideo._cancelCallback = () async {
@@ -233,7 +244,12 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
         sub.cancel();
       };
 
-      showSnackbar(Text('Started downloading: ${video.title}'));
+      showSnackbar(SnackBar(
+        content: Theme(
+            data: settings.theme.themeData,
+            child: Text('Started downloading: ${video.title}')),
+        backgroundColor: settings.theme.themeData.snackBarTheme.backgroundColor,
+      ));
     }
   }
 
@@ -473,6 +489,6 @@ String bytesToString(int bytes) {
   return '${getLargestValue().toStringAsFixed(2)} ${getLargestSymbol()}';
 }
 
-void showSnackbar(Widget message) {
-  //TODO: Implement this
+void showSnackbar(SnackBar snackBar) {
+  AppInit.scaffoldKey.currentState!.showSnackBar(snackBar);
 }

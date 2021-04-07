@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import 'dart:io';
 import 'package:path/path.dart' as path;
 
 Future<void> main() async {
