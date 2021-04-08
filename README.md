@@ -19,7 +19,7 @@ Then locate and run the app (ie in windows it is located inside build\windows\ru
 ## Todos / Known issues
  - [x] Directory finder inside settings doesn't work in MacOS/Linux. ([#7](https://github.com/Hexer10/youtube_downloader_flutter/issues/7)).
  - [x] Show notification when a file is being downloaded/has finished downloading ([#9](https://github.com/Hexer10/youtube_downloader_flutter/issues/9)).
- - [ ] Implement GitHub Actions and upload the binaries as articats ([#6](https://github.com/Hexer10/youtube_downloader_flutter/issues/6)).
+ - [ ] Implement GitHub Actions and upload the binaries as artifacts ([#6](https://github.com/Hexer10/youtube_downloader_flutter/issues/6)).
  - [x] Implement `flutter_ffmpeg` for IOS/Android ([#8](https://github.com/Hexer10/youtube_downloader_flutter/issues/8))
  - [ ] Parse playlists / channel uploads.
 ## Screenshots
