@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         applicationId "net.hexah.youtube_downloader_flutter"
-        minSdkVersion 16
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

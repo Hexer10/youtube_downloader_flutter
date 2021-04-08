@@ -6,13 +6,15 @@ part of 'download_manager.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-DownloadVideo _$DownloadVideoFromJson(Map<String, dynamic> json) {
-  return DownloadVideo(
+SingleTrack _$SingleTrackFromJson(Map<String, dynamic> json) {
+  return SingleTrack(
     json['id'] as int,
     json['path'] as String,
     json['title'] as String,
     json['size'] as String,
     json['totalSize'] as int,
+    _$enumDecodeNullable(_$StreamTypeEnumMap, json['streamType']) ??
+        StreamType.video,
   )
     ..downloadPerc = json['downloadPerc'] as int
     ..downloadStatus =
@@ -21,13 +23,14 @@ DownloadVideo _$DownloadVideoFromJson(Map<String, dynamic> json) {
     ..error = json['error'] as String;
 }
 
-Map<String, dynamic> _$DownloadVideoToJson(DownloadVideo instance) =>
+Map<String, dynamic> _$SingleTrackToJson(SingleTrack instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'path': instance.path,
       'title': instance.title,
       'size': instance.size,
       'totalSize': instance.totalSize,
+      'streamType': _$StreamTypeEnumMap[instance.streamType],
+      'path': instance.path,
       'downloadPerc': instance.downloadPerc,
       'downloadStatus': _$DownloadStatusEnumMap[instance.downloadStatus],
       'downloadedBytes': instance.downloadedBytes,
@@ -60,6 +63,22 @@ K _$enumDecode<K, V>(
   ).key;
 }
 
+K? _$enumDecodeNullable<K, V>(
+  Map<K, V> enumValues,
+  dynamic source, {
+  K? unknownValue,
+}) {
+  if (source == null) {
+    return null;
+  }
+  return _$enumDecode<K, V>(enumValues, source, unknownValue: unknownValue);
+}
+
+const _$StreamTypeEnumMap = {
+  StreamType.audio: 'audio',
+  StreamType.video: 'video',
+};
+
 const _$DownloadStatusEnumMap = {
   DownloadStatus.downloading: 'downloading',
   DownloadStatus.success: 'success',
@@ -68,15 +87,16 @@ const _$DownloadStatusEnumMap = {
   DownloadStatus.canceled: 'canceled',
 };
 
-DownloadVideoTracks _$DownloadVideoTracksFromJson(Map<String, dynamic> json) {
-  return DownloadVideoTracks(
+MuxedTrack _$MuxedTrackFromJson(Map<String, dynamic> json) {
+  return MuxedTrack(
     json['id'] as int,
     json['path'] as String,
     json['title'] as String,
     json['size'] as String,
     json['totalSize'] as int,
-    DownloadVideo.fromJson(json['audio'] as Map<String, dynamic>),
-    DownloadVideo.fromJson(json['video'] as Map<String, dynamic>),
+    SingleTrack.fromJson(json['audio'] as Map<String, dynamic>),
+    SingleTrack.fromJson(json['video'] as Map<String, dynamic>),
+    streamType: _$enumDecode(_$StreamTypeEnumMap, json['streamType']),
   )
     ..downloadPerc = json['downloadPerc'] as int
     ..downloadStatus =
@@ -85,18 +105,18 @@ DownloadVideoTracks _$DownloadVideoTracksFromJson(Map<String, dynamic> json) {
     ..error = json['error'] as String;
 }
 
-Map<String, dynamic> _$DownloadVideoTracksToJson(
-        DownloadVideoTracks instance) =>
+Map<String, dynamic> _$MuxedTrackToJson(MuxedTrack instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'path': instance.path,
       'title': instance.title,
       'size': instance.size,
       'totalSize': instance.totalSize,
+      'path': instance.path,
       'downloadPerc': instance.downloadPerc,
       'downloadStatus': _$DownloadStatusEnumMap[instance.downloadStatus],
       'downloadedBytes': instance.downloadedBytes,
       'error': instance.error,
       'audio': instance.audio,
       'video': instance.video,
+      'streamType': _$StreamTypeEnumMap[instance.streamType],
     };

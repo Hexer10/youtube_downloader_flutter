@@ -6,10 +6,13 @@
   "darkMode": "Modalità scura",
   "ffmpegContainer": "ffmpeg container",
   "ffmpegDescription": "Il format di output quando due tracce (audio + video) vengono unite",
+  "ffmpegNotFound": "FFMPEG non trovato nella PATH",
   "language": "Lingua",
   "downloadDir": "Cartella Download",
   "selectDownloadDir": "Selezione la cartella per i download",
   "invalidDir": "Cartella non valida",
+
+  "permissionError": "L'app necessità del permesso di storage per scaricare i contenuti!",
 
 
   "downloads": "Downloads",
@@ -57,6 +60,16 @@
 
   "startMerge": "Unificando le traccie: {title}",
   "@startMerge": {
+    "placeholders": {
+      "title": {
+        "example": "Best video ever",
+        "description": "Video title"
+      }
+    }
+  },
+
+  "cancelMerge": "Unificazione cancellata: {title}",
+  "@cancelMerge": {
     "placeholders": {
       "title": {
         "example": "Best video ever",

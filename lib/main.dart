@@ -91,13 +91,7 @@ class AppInit extends HookWidget {
           scaffoldMessengerKey: scaffoldKey,
           debugShowCheckedModeBanner: false,
           home: const HomePage(),
-          localizationsDelegates: const [
-
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: settings.state.locale,
           title: 'Youtube Downloader',

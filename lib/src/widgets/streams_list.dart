@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:youtube_downloader_flutter/src/models/download_manager.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../providers.dart';
 import '../shared.dart';
@@ -74,7 +74,8 @@ class StreamsList extends HookWidget {
               if (stream is MuxedStreamInfo) {
                 return MaterialButton(
                   onPressed: () {
-                    downloadManager.downloadStream(yt, video, settings, AppLocalizations.of(context)!,
+                    downloadManager.downloadStream(yt, video, settings,
+                        StreamType.video, AppLocalizations.of(context)!,
                         singleStream: stream);
                   },
                   child: ListTile(
@@ -91,7 +92,8 @@ class StreamsList extends HookWidget {
                     merger.video = stream;
                   },
                   onPressed: () {
-                    downloadManager.downloadStream(yt, video, settings, AppLocalizations.of(context)!,
+                    downloadManager.downloadStream(yt, video, settings,
+                        StreamType.video, AppLocalizations.of(context)!,
                         singleStream: stream);
                   },
                   child: ListTile(
@@ -110,7 +112,8 @@ class StreamsList extends HookWidget {
                     merger.audio = stream;
                   },
                   onPressed: () {
-                    downloadManager.downloadStream(yt, video, settings, AppLocalizations.of(context)!,
+                    downloadManager.downloadStream(yt, video, settings,
+                        StreamType.audio, AppLocalizations.of(context)!,
                         singleStream: stream);
                   },
                   child: ListTile(
@@ -134,7 +137,8 @@ class StreamsList extends HookWidget {
                   padding: MaterialStateProperty.all<EdgeInsets>(
                       const EdgeInsets.all(20))),
               onPressed: () {
-                downloadManager.downloadStream(yt, video, settings, AppLocalizations.of(context)!,
+                downloadManager.downloadStream(yt, video, settings,
+                    StreamType.video, AppLocalizations.of(context)!,
                     merger: merger, ffmpegContainer: settings.ffmpegContainer);
               },
               child: const Text('Download & Merge tracks!')),
