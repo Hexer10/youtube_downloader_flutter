@@ -30,8 +30,17 @@ jobs:
     - name: Setup flutter
       uses: subosito/flutter-action@v1
       
+    - name: Enable desktop support	
+      run: flutter config --enable-linux-desktop
+      
+    - name: Doctor
+      run: flutter doctor -v
+      
     - name: Get dependencies
       run: flutter pub get
+    
+    - name: Build windows
+      run: flutter build windows
     
     - name: Build apk
       run: flutter build apk
