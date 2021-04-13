@@ -45,10 +45,22 @@ jobs:
     - name: Build apk
       run: flutter build apk
       
-    - name: Upload artifacts
+    - name: Upload apk artifacts
       uses: actions/upload-artifact@v1
       with:
         name: Youtube Downloader.apk
         path: ./build/app/outputs/flutter-apk/app-release.apk
-      
+        
+    - name: Zip windows release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: 'release.zip'
+        directory: ./build/windows/runner/release/
+        
+    - name: Upload windows zip artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: Youtube Downloader - Windows.zip
+        path: release.zip
+    
     
