@@ -52,16 +52,15 @@ jobs:
         path: ./build/app/outputs/flutter-apk/app-release.apk
       
     - name: Install zip
-      uses: montudor/action-zip@v0.1.1
+      uses: TonyBogdanov/zip@1.0
+      
+    - name: Zip release
+      run: zip -qq -r release.zip build/windows/runner/release/
 
-    - name: Zip output
-      run: zip -qq -r release.zip *
-      working-directory: build/windows/runner/release/
-        
     - name: Upload windows zip artifacts
       uses: actions/upload-artifact@v1
       with:
         name: Youtube Downloader - Windows.zip
-        path: build/windows/runner/release/release.zip
+        path: release.zip
     
     
