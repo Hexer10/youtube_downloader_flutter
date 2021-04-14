@@ -42,14 +42,14 @@ jobs:
     - name: Build windows
       run: flutter build windows
 
-#    - name: Build apk
-#      run: flutter build apk
-#
-#    - name: Upload apk artifacts
-#      uses: actions/upload-artifact@v1
-#      with:
-#        name: Youtube Downloader.apk
-#        path: ./build/app/outputs/flutter-apk/app-release.apk
+    - name: Build apk
+      run: flutter build apk
+
+    - name: Upload apk artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: Youtube Downloader.apk
+        path: ./build/app/outputs/flutter-apk/app-release.apk
 
     - name: Compress Windows App
       run: .\tool\compress.ps1
