@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:youtube_downloader_flutter/src/widgets/downloads_page.dart';
-import 'package:youtube_downloader_flutter/src/widgets/search_result.dart';
+import 'package:youtube_downloader_flutter/src/widgets/downloads_view/downloads_page.dart';
+import 'package:youtube_downloader_flutter/src/widgets/search_view/search_result.dart';
 
-import 'widgets/suggestion_list.dart';
+import 'widgets/search_view/suggestion_list.dart';
 
 class SearchBar extends HookWidget {
   const SearchBar();

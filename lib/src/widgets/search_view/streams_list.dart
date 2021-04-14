@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:youtube_downloader_flutter/src/models/download_manager.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-import '../providers.dart';
-import '../shared.dart';
+import '../../providers.dart';
+import '../../shared.dart';
 
 class StreamsList extends HookWidget {
   final Video video;

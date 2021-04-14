@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // This is used before the Settings are loaded
+@immutable
 class Settings {
   const Settings();
 
@@ -24,6 +25,7 @@ class Settings {
   Locale get locale => throw UnimplementedError();
 }
 
+@immutable
 class SettingsImpl implements Settings {
   final SharedPreferences _prefs;
 
@@ -39,7 +41,7 @@ class SettingsImpl implements Settings {
   @override
   final Locale locale;
 
-  SettingsImpl._(this._prefs, this.downloadPath, this.theme,
+  const SettingsImpl._(this._prefs, this.downloadPath, this.theme,
       this.ffmpegContainer, this.locale);
 
   @override

@@ -116,8 +116,6 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
     if (Platform.isAndroid || Platform.isIOS) {
       final req = await Permission.storage.request();
-      print(
-          'Denied: ${req.isDenied} | Granted: ${req.isGranted} | Limited: ${req.isLimited} | PermDeny: ${req.isPermanentlyDenied} | Restrict: ${req.isRestricted}');
       if (!req.isGranted) {
         showSnackbar(SnackBar(content: Text(localizations.permissionError)));
         return;
@@ -474,8 +472,10 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
     final videos = <SingleTrack>[];
     for (final id in videoIds) {
       final jsonVideo = prefs.getString(id)!;
-      final track = SingleTrack.fromJson(json.decode(jsonVideo) as Map<String, dynamic>);
-      if (track.downloadStatus == DownloadStatus.downloading || track.downloadStatus == DownloadStatus.muxing) {
+      final track =
+          SingleTrack.fromJson(json.decode(jsonVideo) as Map<String, dynamic>);
+      if (track.downloadStatus == DownloadStatus.downloading ||
+          track.downloadStatus == DownloadStatus.muxing) {
         track.downloadStatus = DownloadStatus.failed;
         track.error = 'Error occurred while downloading';
         prefs.setString(id, json.encode(track));

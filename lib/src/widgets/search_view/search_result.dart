@@ -4,50 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:youtube_downloader_flutter/src/services/search_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../providers.dart';
+import '../../providers.dart';
 import 'streams_list.dart';
-
-// TODO: Maybe remove ValueNotifiers and make class extend ChangeNotifier
-class SearchService {
-  final YoutubeExplode yt;
-  final String query;
-  final ValueNotifier<List<Video>> videos = ValueNotifier<List<Video>>([]);
-  final ValueNotifier<bool> loading = ValueNotifier<bool>(true);
-
-  var _endResults = false;
-  late SearchList _currentPage;
-
-  SearchService(this.yt, this.query) {
-    yt.search.getVideos(query).then((value) {
-      videos.value = [...videos.value, ...value.where((e) => !e.isLive)];
-      loading.value = false;
-      _currentPage = value;
-    });
-  }
-
-  Future<void> nextPage() async {
-    if (_endResults) {
-      return;
-    }
-
-    if (loading.value) {
-      throw Exception('Cannot request the next page while loading.');
-    }
-    loading.value = true;
-    final page = await _currentPage.nextPage();
-    if (page == null) {
-      loading.value = false;
-      _endResults = true;
-      return;
-    }
-    _currentPage = page;
-    videos.value = [...videos.value, ..._currentPage.where((e) => !e.isLive)];
-    loading.value = false;
-  }
-}
 
 class SearchResult extends HookWidget {
   late final searchProvider = StateProvider.autoDispose(
@@ -59,32 +20,35 @@ class SearchResult extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final service = useProvider(searchProvider);
+    final service = useProvider(searchProvider).state;
+    useListenable(service);
+
 
     if (size.width >= 560) {
-      return LandscapeSearch(query: query, service: service.state);
+      return LandscapeSearch(query: query, service: service);
     }
-    return PortraitSearch(query: query, service: service.state);
+    return PortraitSearch(query: query, service: service);
   }
 }
 
-class LandscapeSearch extends HookWidget {
+class LandscapeSearch extends StatelessWidget {
   final String query;
   final SearchService service;
+
 
   const LandscapeSearch({required this.query, required this.service, Key? key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final videoList = useValueListenable<List<Video>>(service.videos);
-    final loading = useValueListenable<bool>(service.loading);
+    final videos = service.videos;
+    final loading = service.loading;
 
     return GridView.builder(
       padding: const EdgeInsets.all(10),
-      itemCount: videoList.length + (loading ? 1 : 0),
+      itemCount: videos.length + (loading ? 1 : 0),
       itemBuilder: (context, index) {
-        if (loading && index == videoList.length) {
+        if (loading && index == videos.length) {
           return Column(
             children: const [
               SizedBox(height: 10),
@@ -92,8 +56,8 @@ class LandscapeSearch extends HookWidget {
             ],
           );
         }
-        final video = videoList[index];
-        if (index > 1 && index == videoList.length - 1 && !loading) {
+        final video = videos[index];
+        if (index > 1 && index == videos.length - 1 && !loading) {
           Future.microtask(service.nextPage);
         }
         return GestureDetector(
@@ -187,7 +151,7 @@ class LandscapeSearch extends HookWidget {
   }
 }
 
-class PortraitSearch extends HookWidget {
+class PortraitSearch extends StatelessWidget {
   final String query;
   final SearchService service;
 
@@ -196,28 +160,14 @@ class PortraitSearch extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final videoList = useValueListenable<List<Video>>(service.videos);
-    final loading = useValueListenable<bool>(service.loading);
-    print('Loading: $loading');
-    final scrollController = useScrollController();
-
-    useEffect(() {
-      scrollController.addListener(() {
-        if (scrollController.position.atEdge &&
-            scrollController.position.pixels != 0) {
-          if (!service.loading.value) {
-            service.nextPage();
-          }
-        }
-      });
-    }, []);
+    final videos = service.videos;
+    final loading = service.loading;
 
     return ListView.builder(
-      controller: scrollController,
       padding: const EdgeInsets.only(top: 10),
-      itemCount: videoList.length + (loading ? 1 : 0),
+      itemCount: videos.length + (loading ? 1 : 0),
       itemBuilder: (context, index) {
-        if (loading && index == videoList.length) {
+        if (service.loading && index == videos.length) {
           return Column(
             children: const [
               SizedBox(height: 10),
@@ -225,7 +175,10 @@ class PortraitSearch extends HookWidget {
             ],
           );
         }
-        final video = videoList[index];
+        final video = videos[index];
+        if (index > 1 && index == videos.length - 1 && !loading) {
+          Future.microtask(service.nextPage);
+        }
         return GestureDetector(
           onTap: () {
             showDialog(
