@@ -41,7 +41,7 @@ jobs:
     
     - name: Build windows
       run: flutter build windows
-    
+
 #    - name: Build apk
 #      run: flutter build apk
 #
