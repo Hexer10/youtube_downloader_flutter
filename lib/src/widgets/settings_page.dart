@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:filepicker_windows/filepicker_windows.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -19,7 +18,6 @@ class SettingsPage extends HookWidget {
     DropdownMenuItem(value: '.webm', child: Text('.webm')),
     DropdownMenuItem(value: '.mkv', child: Text('.mkv'))
   ];
-
 
   final locales = AppLocalizations.supportedLocales
       .map((e) => DropdownMenuItem(value: e, child: Text(e.languageCode)))
@@ -39,7 +37,9 @@ class SettingsPage extends HookWidget {
         children: [
           ListTile(
             title: Text(intl.darkMode),
-            leading: const Icon(CupertinoIcons.moon),
+            leading: Icon(settings.state.theme == ThemeSetting.dark
+                ? Icons.brightness_2
+                : Icons.wb_sunny),
             trailing: Switch(
               value: settings.state.theme == ThemeSetting.dark,
               onChanged: (bool value) => themeOnChanged(settings, value),

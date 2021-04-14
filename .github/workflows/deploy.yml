@@ -19,7 +19,7 @@ jobs:
 
     steps:
     
-    - name: Checout
+    - name: Checkout
       uses: actions/checkout@v2
     
     - name: Setup java
@@ -42,25 +42,24 @@ jobs:
     - name: Build windows
       run: flutter build windows
     
-    - name: Build apk
-      run: flutter build apk
-      
-    - name: Upload apk artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: Youtube Downloader.apk
-        path: ./build/app/outputs/flutter-apk/app-release.apk
-      
-    - name: Install zip
-      uses: TonyBogdanov/zip@1.0
-      
-    - name: Zip release
-      run: zip -qq -r release.zip build/windows/runner/release/
+#    - name: Build apk
+#      run: flutter build apk
+#
+#    - name: Upload apk artifacts
+#      uses: actions/upload-artifact@v1
+#      with:
+#        name: Youtube Downloader.apk
+#        path: ./build/app/outputs/flutter-apk/app-release.apk
+
+    - name: Compress Windows App
+      run: .\tool\compress.ps1
+      shell: powershell
+
 
     - name: Upload windows zip artifacts
       uses: actions/upload-artifact@v1
       with:
         name: Youtube Downloader - Windows.zip
-        path: release.zip
+        path: Youtube Downloader.zip
     
     
