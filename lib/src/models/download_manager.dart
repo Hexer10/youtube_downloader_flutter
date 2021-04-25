@@ -183,9 +183,9 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
     }, cancelOnError: true);
 
     downloadVideo._cancelCallback = () async {
+      sub.cancel();
       await cleanUp(sink, file);
       downloadVideo.downloadStatus = DownloadStatus.canceled;
-      sub.cancel();
 
       showSnackbar(
           SnackBar(content: Text(localizations.cancelDownload(video.title))));
@@ -250,6 +250,9 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
           audioTrack.path,
           '-i',
           videoTrack.path,
+          '-progress',
+          '-',
+          '-y',
           '-shortest',
           path,
         ];
@@ -300,10 +303,18 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
     });
 
     process.stdout.listen((event) {
-      print('OUT: ${utf8.decode(event)}');
-    });
-    process.stderr.listen((event) {
-      print('ERR: ${utf8.decode(event)}');
+      final data = utf8.decode(event);
+      print('OUT: $data');
+
+      final timeStr = RegExp(r'out_time_ms=(\d+)').firstMatch(data)?.group(1);
+      if (timeStr == null) {
+        return;
+      }
+
+      final ms = int.parse(timeStr);
+
+      muxedTrack.downloadPerc =
+          (ms / video.duration!.inMicroseconds * 100).round();
     });
 
     muxedTrack._cancelCallback = () async {
@@ -429,9 +440,9 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
     }, cancelOnError: true);
 
     downloadVideo._cancelCallback = () async {
+      sub.cancel();
       await cleanUp(sink, file);
       downloadVideo.downloadStatus = DownloadStatus.canceled;
-      sub.cancel();
     };
     return downloadVideo;
   }

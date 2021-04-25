@@ -80,7 +80,9 @@ class LeadingIcon extends HookWidget {
       case DownloadStatus.failed:
         return const Icon(Icons.error);
       case DownloadStatus.muxing:
-        return const CircularProgressIndicator();
+        return video.downloadPerc == 100
+            ? const CircularProgressIndicator()
+            : Text('${video.downloadPerc}%');
       case DownloadStatus.canceled:
         return const Icon(Icons.cancel);
     }
