@@ -1,6 +1,6 @@
 # Youtube Downloader Flutter
 
-This is a cross platform app (currently tested on Android and Windows) to download videos from YouTube, it's still a WIP. It is mostly e remake of [YoutubeDownloader](https://github.com/Tyrrrz/YoutubeDownloader).
+This is a cross platform app (currently tested on Android, Windows and Linux) to download videos from YouTube, it's still a WIP. It is mostly e remake of [YoutubeDownloader](https://github.com/Tyrrrz/YoutubeDownloader).
 You can search a video from YouTube (within the app) and chose which stream you'd like to download.
 If FFMPEG is added to the path you can long-press two tiles (audio and video), and those tracks will be merged into one, remember that muxed tracks (the ones with already audio + video, have a poor quality).
 
