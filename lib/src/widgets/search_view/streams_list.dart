@@ -3,13 +3,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:youtube_downloader_flutter/src/models/download_manager.dart';
+import 'package:youtube_downloader_flutter/src/models/query_video.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../providers.dart';
 import '../../shared.dart';
 
 class StreamsList extends HookWidget {
-  final Video video;
+  final QueryVideo video;
 
   StreamsList(this.video);
 
@@ -46,7 +47,7 @@ class StreamsList extends HookWidget {
     final manifest = useMemoFuture(
         () => yt.videos.streamsClient.getManifest(video.id),
         initialData: null,
-        keys: [video.id.value]);
+        keys: [video.id]);
 
     if (!manifest.hasData) {
       return const Center(child: CircularProgressIndicator());

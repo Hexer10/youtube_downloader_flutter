@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_downloader_flutter/main.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import 'query_video.dart';
 import 'settings.dart';
 
 part 'download_manager.g.dart';
@@ -20,8 +21,8 @@ part 'download_manager.g.dart';
 class DownloadManager extends ChangeNotifier {
   DownloadManager();
 
-  Future<void> downloadStream(YoutubeExplode yt, Video video, Settings settings,
-          StreamType type, AppLocalizations localizations,
+  Future<void> downloadStream(YoutubeExplode yt, QueryVideo video,
+          Settings settings, StreamType type, AppLocalizations localizations,
           {StreamInfo? singleStream,
           StreamMerge? merger,
           String? ffmpegContainer}) =>
@@ -103,8 +104,8 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
   }
 
   @override
-  Future<void> downloadStream(YoutubeExplode yt, Video video, Settings settings,
-      StreamType type, AppLocalizations localizations,
+  Future<void> downloadStream(YoutubeExplode yt, QueryVideo video,
+      Settings settings, StreamType type, AppLocalizations localizations,
       {StreamInfo? singleStream,
       StreamMerge? merger,
       String? ffmpegContainer}) async {
@@ -144,7 +145,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
   Future<void> processSingleTrack(
       YoutubeExplode yt,
-      Video video,
+      QueryVideo video,
       StreamInfo stream,
       String saveDir,
       int id,
@@ -199,7 +200,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
   Future<void> processMuxedTrack(
       YoutubeExplode yt,
-      Video video,
+      QueryVideo video,
       StreamMerge merger,
       StreamInfo stream,
       String saveDir,
@@ -283,7 +284,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       String outPath,
       List<String> args,
       VoidCallback downloadListener,
-      Video video,
+      QueryVideo video,
       AppLocalizations localizations) async {
     final process = await Process.start('ffmpeg', args, runInShell: true);
     process.exitCode.then((exitCode) async {
@@ -314,7 +315,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       final ms = int.parse(timeStr);
 
       muxedTrack.downloadPerc =
-          (ms / video.duration!.inMicroseconds * 100).round();
+          (ms / video.duration.inMicroseconds * 100).round();
     });
 
     muxedTrack._cancelCallback = () async {
@@ -334,7 +335,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       String outPath,
       List<String> args,
       VoidCallback downloadListener,
-      Video video,
+      QueryVideo video,
       AppLocalizations localizations) async {
     final ffmpeg = FlutterFFmpeg();
     final id = await ffmpeg.executeAsyncWithArguments(args, (execution) async {
@@ -409,7 +410,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
       StreamInfo stream,
       String saveDir,
       String container,
-      Video video,
+      QueryVideo video,
       StreamType type,
       AppLocalizations localizations) {
     final id = nextId;

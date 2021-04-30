@@ -79,7 +79,7 @@ class LandscapeSearch extends StatelessWidget {
                         AspectRatio(
                           aspectRatio: 16 / 9,
                           child: Image.network(
-                            video.thumbnails.highResUrl,
+                            video.thumbnail,
                             fit: BoxFit.fitWidth,
                           ),
                         ),
@@ -94,7 +94,7 @@ class LandscapeSearch extends StatelessWidget {
                                   horizontal: 3, vertical: 1),
                               child: Text(
                                 _formatDuration(
-                                    video.duration ?? const Duration()),
+                                    video.duration),
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyText1
@@ -196,7 +196,7 @@ class PortraitSearch extends StatelessWidget {
                       AspectRatio(
                         aspectRatio: 16 / 9,
                         child: Image.network(
-                          video.thumbnails.highResUrl,
+                          video.thumbnail,
                           fit: BoxFit.fitWidth,
                         ),
                       ),
@@ -211,7 +211,7 @@ class PortraitSearch extends StatelessWidget {
                                 horizontal: 3, vertical: 1),
                             child: Text(
                               _formatDuration(
-                                  video.duration ?? const Duration()),
+                                  video.duration),
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyText1
