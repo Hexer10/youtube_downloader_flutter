@@ -31,7 +31,7 @@ class SearchResult extends HookWidget {
   }
 }
 
-class LandscapeSearch extends StatelessWidget {
+class LandscapeSearch extends HookWidget {
   final String query;
   final SearchService service;
 
@@ -43,109 +43,116 @@ class LandscapeSearch extends StatelessWidget {
   Widget build(BuildContext context) {
     final videos = service.videos;
     final loading = service.loading;
+    final controller = useScrollController();
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(10),
-      itemCount: videos.length + (loading ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (loading && index == videos.length) {
-          return Column(
-            children: const [
-              SizedBox(height: 10),
-              CircularProgressIndicator(),
-            ],
-          );
-        }
-        final video = videos[index];
-        if (index > 1 && index == videos.length - 1 && !loading) {
-          Future.microtask(service.nextPage);
-        }
-        return GestureDetector(
-          onTap: () {
-            showDialog(
-                context: context, builder: (context) => StreamsList(video));
-          },
-          child: Card(
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8, bottom: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Stack(
-                      children: [
-                        AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Image.network(
-                            video.thumbnail,
-                            fit: BoxFit.fitWidth,
+    return Scrollbar(
+      controller: controller,
+      showTrackOnHover: false,
+      isAlwaysShown: true,
+      child: GridView.builder(
+        controller: controller,
+        padding: const EdgeInsets.all(10),
+        itemCount: videos.length + (loading ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (loading && index == videos.length) {
+            return Column(
+              children: const [
+                SizedBox(height: 10),
+                CircularProgressIndicator(),
+              ],
+            );
+          }
+          final video = videos[index];
+          if (index > 1 && index == videos.length - 1 && !loading) {
+            Future.microtask(service.nextPage);
+          }
+          return GestureDetector(
+            onTap: () {
+              showDialog(
+                  context: context, builder: (context) => StreamsList(video));
+            },
+            child: Card(
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Stack(
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: Image.network(
+                              video.thumbnail,
+                              fit: BoxFit.fitWidth,
+                            ),
                           ),
-                        ),
-                        Positioned(
-                            right: 9,
-                            bottom: 9,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(.75),
-                                  borderRadius: BorderRadius.circular(4)),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 3, vertical: 1),
-                              child: Text(
-                                _formatDuration(
-                                    video.duration),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(
-                                        fontSize: 11, color: Colors.white),
-                              ),
-                            )),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: AutoSizeText(
-                        video.title,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            ?.copyWith(fontSize: 15),
-                        textAlign: TextAlign.start,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                          Positioned(
+                              right: 9,
+                              bottom: 9,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(.75),
+                                    borderRadius: BorderRadius.circular(4)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 3, vertical: 1),
+                                child: Text(
+                                  _formatDuration(
+                                      video.duration),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1
+                                      ?.copyWith(
+                                          fontSize: 11, color: Colors.white),
+                                ),
+                              )),
+                        ],
                       ),
-                    ),
-                    const Spacer(),
-                    Flexible(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 17),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: AutoSizeText(
-                            '${AppLocalizations.of(context)!.author}: ${video.author}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle1
-                                ?.copyWith(
-                                    fontSize: 13, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.start,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            minFontSize: 6),
+                          video.title,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1
+                              ?.copyWith(fontSize: 15),
+                          textAlign: TextAlign.start,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                  ],
+                      const Spacer(),
+                      Flexible(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 17),
+                          child: AutoSizeText(
+                              '${AppLocalizations.of(context)!.author}: ${video.author}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle1
+                                  ?.copyWith(
+                                      fontSize: 13, fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.start,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              minFontSize: 6),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 250,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
+          );
+        },
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 250,
+          crossAxisSpacing: 20,
+          mainAxisSpacing: 20,
+        ),
       ),
     );
   }
