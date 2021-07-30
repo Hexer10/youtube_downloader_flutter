@@ -10,7 +10,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../providers.dart';
 import 'streams_list.dart';
 
-class SearchResult extends HookWidget {
+class SearchResult extends HookConsumerWidget {
   late final searchProvider = StateProvider.autoDispose(
       (ref) => SearchService(ref.read(ytProvider), query));
   final String query;
@@ -18,11 +18,14 @@ class SearchResult extends HookWidget {
   SearchResult({required this.query, Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final size = MediaQuery.of(context).size;
-    final service = useProvider(searchProvider).state;
+    final service = ref.watch(searchProvider).state;
     useListenable(service);
 
+    if (service.error) {
+      return Text(service.errorMessage);
+    }
 
     if (size.width >= 560) {
       return LandscapeSearch(query: query, service: service);
@@ -34,7 +37,6 @@ class SearchResult extends HookWidget {
 class LandscapeSearch extends HookWidget {
   final String query;
   final SearchService service;
-
 
   const LandscapeSearch({required this.query, required this.service, Key? key})
       : super(key: key);
@@ -99,8 +101,7 @@ class LandscapeSearch extends HookWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 3, vertical: 1),
                                 child: Text(
-                                  _formatDuration(
-                                      video.duration),
+                                  _formatDuration(video.duration),
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyText1
@@ -134,7 +135,8 @@ class LandscapeSearch extends HookWidget {
                                   .textTheme
                                   .subtitle1
                                   ?.copyWith(
-                                      fontSize: 13, fontWeight: FontWeight.bold),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold),
                               textAlign: TextAlign.start,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -217,8 +219,7 @@ class PortraitSearch extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 3, vertical: 1),
                             child: Text(
-                              _formatDuration(
-                                  video.duration),
+                              _formatDuration(video.duration),
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyText1

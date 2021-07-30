@@ -1,17 +1,13 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
-import 'package:filepicker_windows/filepicker_windows.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:youtube_downloader_flutter/src/components/linux_folderpicker.dart';
 
 import '../models/settings.dart';
 import '../providers.dart';
 
-class SettingsPage extends HookWidget {
+class SettingsPage extends HookConsumerWidget {
   SettingsPage({Key? key}) : super(key: key);
 
   static const ffmpegContainers = <DropdownMenuItem<String>>[
@@ -25,9 +21,9 @@ class SettingsPage extends HookWidget {
       .toList();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final intl = AppLocalizations.of(context)!;
-    final settings = useProvider(settingsProvider);
+    final settings = ref.watch(settingsProvider);
 
     return Scaffold(
       appBar: const PreferredSize(
@@ -45,9 +41,8 @@ class SettingsPage extends HookWidget {
               value: settings.state.theme == ThemeSetting.dark,
               onChanged: (bool value) => themeOnChanged(settings, value),
             ),
-            onTap: () =>
-                themeOnChanged(
-                    settings, settings.state.theme != ThemeSetting.dark),
+            onTap: () => themeOnChanged(
+                settings, settings.state.theme != ThemeSetting.dark),
           ),
           const Divider(
             height: 0,
@@ -56,33 +51,11 @@ class SettingsPage extends HookWidget {
             title: Text(intl.downloadDir),
             subtitle: Text(settings.state.downloadPath),
             onTap: () async {
-              if (Platform.isWindows) {
-                final file = DirectoryPicker()
-                  ..title = intl.selectDownloadDir;
-
-                final result = file.getDirectory();
-                if (result == null) {
-                  return;
-                }
-                settings.state =
-                    settings.state.copyWith(downloadPath: result.path);
+              final result = await getDirectoryPath();
+              if (result?.isEmpty ?? true) {
                 return;
-              } else if (Platform.isLinux) {
-                final defaultDir = await getDefaultDownloadDir();
-                final path = await showFolderPicker(context, 'Select directory', defaultDir);
-                settings.state =
-                    settings.state.copyWith(downloadPath: path);
-              } else {
-                final result = await FilePicker.platform.getDirectoryPath();
-                if (result == null) {
-                  return;
-                }
-                if (result == '/') {
-                  //TODO Show snackbar when path is not valid
-                  return;
-                }
-                settings.state = settings.state.copyWith(downloadPath: result);
               }
+              settings.state = settings.state.copyWith(downloadPath: result);
             },
           ),
           const Divider(
@@ -93,14 +66,12 @@ class SettingsPage extends HookWidget {
             subtitle: Text(intl.ffmpegDescription),
             trailing: DropdownButton(
               value: settings.state.ffmpegContainer,
-              onChanged: (String? value) =>
-              settings.state =
+              onChanged: (String? value) => settings.state =
                   settings.state.copyWith(ffmpegContainer: value),
               items: ffmpegContainers,
             ),
-            onTap: () =>
-                themeOnChanged(
-                    settings, settings.state.theme != ThemeSetting.dark),
+            onTap: () => themeOnChanged(
+                settings, settings.state.theme != ThemeSetting.dark),
           ),
           const Divider(
             height: 0,
@@ -110,12 +81,11 @@ class SettingsPage extends HookWidget {
             trailing: DropdownButton(
               value: settings.state.locale,
               onChanged: (Locale? value) =>
-              settings.state = settings.state.copyWith(locale: value),
+                  settings.state = settings.state.copyWith(locale: value),
               items: locales,
             ),
-            onTap: () =>
-                themeOnChanged(
-                    settings, settings.state.theme != ThemeSetting.dark),
+            onTap: () => themeOnChanged(
+                settings, settings.state.theme != ThemeSetting.dark),
           ),
         ],
       ),
@@ -150,10 +120,7 @@ class SettingsAppBar extends HookWidget {
             Center(
               child: Text(
                 AppLocalizations.of(context)!.settings,
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .headline5,
+                style: Theme.of(context).textTheme.headline5,
               ),
             ),
           ]),

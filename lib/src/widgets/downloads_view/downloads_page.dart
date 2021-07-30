@@ -6,12 +6,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../providers.dart';
 
-class DownloadsPage extends HookWidget {
+class DownloadsPage extends HookConsumerWidget {
   const DownloadsPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final downloadManager = useProvider(downloadProvider).state;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final downloadManager = ref.watch(downloadProvider).state;
     useListenable(downloadManager);
 
     final length = downloadManager.videos.length;

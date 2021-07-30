@@ -1,14 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:window_size/window_size.dart';
 import 'package:win32/win32.dart';
+import 'package:window_size/window_size.dart';
 import 'package:youtube_downloader_flutter/src/models/download_manager.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'src/models/settings.dart';
 import 'src/providers.dart';
@@ -39,34 +38,31 @@ class MyApp extends StatelessWidget {
 
 class MainObserver implements ProviderObserver {
   @override
-  void didAddProvider(ProviderBase provider, Object? value) {
-    print('Added: $provider : $value');
+  void didAddProvider(
+      ProviderBase provider, Object? value, ProviderContainer container) {
+    print('Added: $provider : $value(${value.runtimeType})');
   }
 
   @override
-  void didDisposeProvider(ProviderBase provider) {
+  void didDisposeProvider(ProviderBase provider, ProviderContainer container) {
     print('Disposed: $provider');
   }
 
   @override
-  void didUpdateProvider(ProviderBase provider, Object? newValue) {
+  void didUpdateProvider(ProviderBase provider, Object? previousValue,
+      Object? newValue, ProviderContainer container) {
     print('Update: $provider : $newValue');
-  }
-
-  @override
-  void mayHaveChanged(ProviderBase provider) {
-    print('MayChange: $provider');
   }
 }
 
-class AppInit extends HookWidget {
+class AppInit extends HookConsumerWidget {
   static final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final fetched = useState<bool>(false);
-    final settings = useProvider(settingsProvider);
-    final downloadManager = useProvider(downloadProvider);
+    final settings = ref.watch(settingsProvider);
+    final downloadManager = ref.watch(downloadProvider);
 
     useEffect(() {
       SharedPreferences.getInstance().then((value) async {
@@ -88,14 +84,14 @@ class AppInit extends HookWidget {
 
     // TODO: Might be worth finding another way to achieve this
     return MaterialApp(
-          scaffoldMessengerKey: scaffoldKey,
-          debugShowCheckedModeBanner: false,
-          home: const HomePage(),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: settings.state.locale,
-          title: 'Youtube Downloader',
-          theme: settings.state.theme.themeData,
-        );
+      scaffoldMessengerKey: scaffoldKey,
+      debugShowCheckedModeBanner: false,
+      home: const HomePage(),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: settings.state.locale,
+      title: 'Youtube Downloader',
+      theme: settings.state.theme.themeData,
+    );
   }
 }

@@ -9,7 +9,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../../providers.dart';
 import '../../shared.dart';
 
-class StreamsList extends HookWidget {
+class StreamsList extends HookConsumerWidget {
   final QueryVideo video;
 
   StreamsList(this.video);
@@ -36,10 +36,10 @@ class StreamsList extends HookWidget {
   final mergeTracks = StreamMerge();
 
   @override
-  Widget build(BuildContext context) {
-    final yt = useProvider(ytProvider);
-    final settings = useProvider(settingsProvider).state;
-    final downloadManager = useProvider(downloadProvider).state;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final yt = ref.watch(ytProvider);
+    final settings = ref.watch(settingsProvider).state;
+    final downloadManager = ref.watch(downloadProvider).state;
 
     final filter = useState(Filter.all);
     final merger = useListenable(mergeTracks);

@@ -41,13 +41,8 @@ class DownloadTile extends HookWidget {
   Widget build(BuildContext context) {
     final video = useListenable(this.video);
     return ListTile(
-        onTap: video.downloadStatus == DownloadStatus.success
-            ? () async {
-                final res =
-                    await OpenFile.open(video.path, type: getFileType(video));
-                print('R: ${res.type} | M: ${res.message}');
-              }
-            : null,
+        onTap:
+            video.downloadStatus == DownloadStatus.success ? _openFile : null,
         title: Text(video.title,
             style: video.downloadStatus == DownloadStatus.canceled ||
                     video.downloadStatus == DownloadStatus.failed
@@ -62,6 +57,10 @@ class DownloadTile extends HookWidget {
                     : null),
         trailing: TrailingIcon(video),
         leading: LeadingIcon(video));
+  }
+
+  Future<void> _openFile() async {
+    await OpenFile.open(video.path, type: getFileType(video));
   }
 }
 
@@ -89,14 +88,14 @@ class LeadingIcon extends HookWidget {
   }
 }
 
-class TrailingIcon extends HookWidget {
+class TrailingIcon extends HookConsumerWidget {
   final SingleTrack video;
 
   const TrailingIcon(this.video, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final downloadManager = useProvider(downloadProvider).state;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final downloadManager = ref.watch(downloadProvider).state;
 
     switch (video.downloadStatus) {
       case DownloadStatus.downloading:

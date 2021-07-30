@@ -10,19 +10,25 @@ abstract class SearchService extends ChangeNotifier {
 
   bool get loading;
 
+  bool get error;
+
+  String get errorMessage;
+
   UnmodifiableListView<QueryVideo> get videos;
 
   factory SearchService(YoutubeExplode yt, String query) {
     final cid = ChannelId.parseChannelId(query);
     if (cid != null) {
+      print('Channel!');
       return _ChannelSearchServiceImpl(yt, cid);
     }
+    print('Video!');
     return _VideoSearchServiceImpl(yt, query);
   }
 }
 
-
-class _ChannelSearchServiceImpl extends ChangeNotifier implements SearchService {
+class _ChannelSearchServiceImpl extends ChangeNotifier
+    implements SearchService {
   final YoutubeExplode yt;
   final String channelId;
 
@@ -30,6 +36,12 @@ class _ChannelSearchServiceImpl extends ChangeNotifier implements SearchService 
 
   @override
   bool get loading => _loading;
+
+  @override
+  bool error = false;
+
+  @override
+  String errorMessage = '';
 
   final List<QueryVideo> _videos = <QueryVideo>[];
 
@@ -41,17 +53,20 @@ class _ChannelSearchServiceImpl extends ChangeNotifier implements SearchService 
 
   _ChannelSearchServiceImpl(this.yt, this.channelId) {
     yt.channels.getUploadsFromPage(channelId).then((value) {
-      _videos.addAll(value.where((e) => !e.isLive).map((e) =>
-          QueryVideo(
-              e.title,
-              e.id.value,
-              e.author,
-              e.duration!,
-              e.thumbnails.highResUrl)));
+      _videos.addAll(value.where((e) => !e.isLive).map((e) => QueryVideo(
+          e.title,
+          e.id.value,
+          e.author,
+          e.duration!,
+          e.thumbnails.highResUrl)));
       _loading = false;
       _currentPage = value;
       notifyListeners();
-    });
+    }).catchError((e, s) {
+      error = true;
+      errorMessage = (e as YoutubeExplodeException).message;
+      notifyListeners();
+    }, test: (e) => e is YoutubeExplodeException);
   }
 
   @override
@@ -74,15 +89,12 @@ class _ChannelSearchServiceImpl extends ChangeNotifier implements SearchService 
       return;
     }
     _currentPage = page;
-    _videos.addAll(_currentPage.where((e) => !e.isLive).map((e) =>
-        QueryVideo(
-            e.title, e.id.value, e.author, e.duration!,
-            e.thumbnails.highResUrl)));
+    _videos.addAll(_currentPage.where((e) => !e.isLive).map((e) => QueryVideo(
+        e.title, e.id.value, e.author, e.duration!, e.thumbnails.highResUrl)));
     _loading = false;
     notifyListeners();
   }
 }
-
 
 class _VideoSearchServiceImpl extends ChangeNotifier implements SearchService {
   final YoutubeExplode yt;
@@ -92,6 +104,12 @@ class _VideoSearchServiceImpl extends ChangeNotifier implements SearchService {
 
   @override
   bool get loading => _loading;
+
+  @override
+  bool error = false;
+
+  @override
+  String errorMessage = '';
 
   final List<QueryVideo> _videos = <QueryVideo>[];
 
@@ -103,17 +121,20 @@ class _VideoSearchServiceImpl extends ChangeNotifier implements SearchService {
 
   _VideoSearchServiceImpl(this.yt, this.query) {
     yt.search.getVideos(query).then((value) {
-      _videos.addAll(value.where((e) => !e.isLive).map((e) =>
-          QueryVideo(
-              e.title,
-              e.id.value,
-              e.author,
-              e.duration!,
-              e.thumbnails.highResUrl)));
+      _videos.addAll(value.where((e) => !e.isLive).map((e) => QueryVideo(
+          e.title,
+          e.id.value,
+          e.author,
+          e.duration!,
+          e.thumbnails.highResUrl)));
       _loading = false;
       _currentPage = value;
       notifyListeners();
-    });
+    }).catchError((e, s) {
+      error = true;
+      errorMessage = (e as YoutubeExplodeException).message;
+      notifyListeners();
+    }, test: (e) => e is YoutubeExplodeException);
   }
 
   @override
@@ -136,10 +157,8 @@ class _VideoSearchServiceImpl extends ChangeNotifier implements SearchService {
       return;
     }
     _currentPage = page;
-    _videos.addAll(_currentPage.where((e) => !e.isLive).map((e) =>
-        QueryVideo(
-            e.title, e.id.value, e.author, e.duration!,
-            e.thumbnails.highResUrl)));
+    _videos.addAll(_currentPage.where((e) => !e.isLive).map((e) => QueryVideo(
+        e.title, e.id.value, e.author, e.duration!, e.thumbnails.highResUrl)));
     _loading = false;
     notifyListeners();
   }
