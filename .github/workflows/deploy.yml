@@ -27,7 +27,7 @@ jobs:
           java-version: '12.x'
           
       - name: Setup flutter
-        uses: subosito/flutter-action@vmaster
+        uses: subosito/flutter-action@master
         
       - name: Enable desktop support	
         run: flutter config --enable-windows-desktop
