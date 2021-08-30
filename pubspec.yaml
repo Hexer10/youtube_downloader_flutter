@@ -28,7 +28,7 @@ dependencies:
   win32: ^2.2.8
   auto_size_text: ^3.0.0-nullsafety.0
   collection: ^1.15.0
-  json_annotation: ^4.1.0
+  json_annotation: ^4.0.1
   url_launcher: ^6.0.9
   intl: ^0.17.0
   flutter_ffmpeg: ^0.4.2
