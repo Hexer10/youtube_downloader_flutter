@@ -112,7 +112,7 @@ class TrailingIcon extends HookConsumerWidget {
                 icon: const Icon(Icons.folder_open),
                 onPressed: () async {
                   final res = await OpenFile.open(path.dirname(video.path));
-                  print('R: ${res.type} | M: ${res.message}');
+                  debugPrint('R: ${res.type} | M: ${res.message}');
                 }),
             IconButton(
                 icon: const Icon(Icons.delete_forever),

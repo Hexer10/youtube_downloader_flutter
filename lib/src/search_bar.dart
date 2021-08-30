@@ -6,7 +6,7 @@ import 'package:youtube_downloader_flutter/src/widgets/search_view/search_result
 import 'widgets/search_view/suggestion_list.dart';
 
 class SearchBar extends HookWidget {
-  const SearchBar();
+  const SearchBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

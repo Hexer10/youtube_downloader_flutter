@@ -19,10 +19,10 @@ abstract class SearchService extends ChangeNotifier {
   factory SearchService(YoutubeExplode yt, String query) {
     final cid = ChannelId.parseChannelId(query);
     if (cid != null) {
-      print('Channel!');
+      debugPrint('Channel!');
       return _ChannelSearchServiceImpl(yt, cid);
     }
-    print('Video!');
+    debugPrint('Video!');
     return _VideoSearchServiceImpl(yt, query);
   }
 }

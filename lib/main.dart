@@ -23,15 +23,17 @@ void main() {
       SetProcessDpiAwareness(1);
     }
   }
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
       observers: [MainObserver()],
-      child: AppInit(),
+      child: const AppInit(),
     );
   }
 }
@@ -40,23 +42,25 @@ class MainObserver implements ProviderObserver {
   @override
   void didAddProvider(
       ProviderBase provider, Object? value, ProviderContainer container) {
-    print('Added: $provider : $value(${value.runtimeType})');
+    debugPrint('Added: $provider : $value(${value.runtimeType})');
   }
 
   @override
   void didDisposeProvider(ProviderBase provider, ProviderContainer container) {
-    print('Disposed: $provider');
+    debugPrint('Disposed: $provider');
   }
 
   @override
   void didUpdateProvider(ProviderBase provider, Object? previousValue,
       Object? newValue, ProviderContainer container) {
-    print('Update: $provider : $newValue');
+    debugPrint('Update: $provider : $newValue');
   }
 }
 
 class AppInit extends HookConsumerWidget {
   static final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+
+  const AppInit({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
