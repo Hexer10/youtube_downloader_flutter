@@ -8,7 +8,7 @@ class SuggestionList extends HookConsumerWidget {
   final String query;
   final void Function(String) callback;
 
-  const SuggestionList(this.query, this.callback);
+  const SuggestionList(this.query, this.callback, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

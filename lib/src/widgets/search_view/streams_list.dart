@@ -12,7 +12,7 @@ import '../../shared.dart';
 class StreamsList extends HookConsumerWidget {
   final QueryVideo video;
 
-  StreamsList(this.video);
+  StreamsList(this.video, {Key? key}) : super(key: key);
 
   static const List<DropdownMenuItem<Filter>> items = [
     DropdownMenuItem(

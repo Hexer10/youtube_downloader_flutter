@@ -305,7 +305,7 @@ class DownloadManagerImpl extends ChangeNotifier implements DownloadManager {
 
     process.stdout.listen((event) {
       final data = utf8.decode(event);
-      print('OUT: $data');
+      debugPrint('OUT: $data');
 
       final timeStr = RegExp(r'out_time_ms=(\d+)').firstMatch(data)?.group(1);
       if (timeStr == null) {
@@ -578,7 +578,7 @@ class SingleTrack extends ChangeNotifier {
 
   void cancelDownload() {
     if (_cancelCallback == null) {
-      print('Tried to cancel an uncancellable video');
+      debugPrint('Tried to cancel an uncancellable video');
       return;
     }
     _cancelCallback!();

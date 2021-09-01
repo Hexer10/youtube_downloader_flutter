@@ -35,7 +35,7 @@ class DownloadsPage extends HookConsumerWidget {
 }
 
 class DownloadsAppBar extends HookWidget {
-  const DownloadsAppBar();
+  const DownloadsAppBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
