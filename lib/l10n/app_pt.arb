@@ -1,0 +1,89 @@
+{
+  "title": "Youtube Downloader",
+  "startSearch": "Inicie sua busca!",
+
+  "settings": "Configurações",
+  "darkMode": "Modo Noturno",
+  "ffmpegContainer": "FFMPEG container",
+  "ffmpegDescription": "Este é o formato de saida quando dois arquivos (audio + video) são mesclados",
+  "ffmpegNotFound": "FFMPEG não foi encontrado em PATH",
+  "language": "Idioma",
+  "downloadDir": "Local de armazenamento",
+  "selectDownloadDir": "Selecione uma pasta para download",
+  "invalidDir": "Local de armazenamento inválido",
+
+  "downloads": "Downloads",
+  "author": "Autor",
+
+  "permissionError": "O applicativo precisa ter acesso ao seu armazenamento para realizar seus downloads!",
+
+  "startDownload": "Iniciando download: {title}",
+  "@startDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Melhor vídeo de todos",
+        "description": "Título do vídeo"
+      }
+    }
+  },
+
+  "failDownload": "Ocorreu um erro em: {title}",
+  "@failDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Melhor vídeo de todos",
+        "description": "Título do vídeo"
+      }
+    }
+  },
+
+  "cancelDownload": "Download cancelado: {title}",
+  "@cancelDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Melhor vídeo de todos",
+        "description": "Título do vídeo"
+      }
+    }
+  },
+
+  "finishDownload": "Download finalizado: {title}",
+  "@finishDownload": {
+    "placeholders": {
+      "title": {
+        "example": "Melhor vídeo de todos",
+        "description": "Título do vídeo"
+      }
+    }
+  },
+
+  "startMerge": "Mesclando arquivos de: {title}",
+  "@startMerge": {
+    "placeholders": {
+      "title": {
+        "example": "Melhor vídeo de todos",
+        "description": "Título do vídeo"
+      }
+    }
+  },
+
+  "cancelMerge": "Junção cancelada: {title}",
+  "@cancelMerge": {
+    "placeholders": {
+      "title": {
+        "example": "Melhor vídeo de todos",
+        "description": "Título do vídeo"
+      }
+    }
+  },
+
+  "finishMerge": "Finalizado a junção de: {title}",
+  "@finishMerge": {
+    "placeholders": {
+      "title": {
+        "example": "Melhor vídeo de todos",
+        "description": "Título do vídeo"
+      }
+    }
+  }
+}
