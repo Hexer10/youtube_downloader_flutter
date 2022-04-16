@@ -29,5 +29,3 @@ Then locate and run the app (ie in windows it is located inside build\windows\ru
 <img width="637" alt="SearchBig" src="https://user-images.githubusercontent.com/21113203/113563918-cbeace80-9608-11eb-8e26-ba4212cccd9d.PNG">
 <img width="286" alt="SearchSmall" src="https://user-images.githubusercontent.com/21113203/113563926-cee5bf00-9608-11eb-950f-4934906554b9.PNG">
 <img width="659" alt="StreamList Merge" src="https://user-images.githubusercontent.com/21113203/113563992-e45ae900-9608-11eb-8bb5-6787fd0c3e86.PNG"><img width="666" alt="Downloads" src="https://user-images.githubusercontent.com/21113203/113564014-ecb32400-9608-11eb-9a69-1aa5a0655217.PNG">
-
-
